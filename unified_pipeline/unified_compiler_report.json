@@ -1,0 +1,23 @@
+{
+  "polyhedral_fusion": {
+    "unfused_traffic_kb": 13824,
+    "fused_traffic_kb": 9984,
+    "dram_traffic_reduction_pct": 27.77777777777778,
+    "sram_compression_pct": 99.63541666666667,
+    "kernel_speedup": 1.95
+  },
+  "roofline_double_buffering": {
+    "intensity": 187.5,
+    "is_compute_bound": false,
+    "latency_hiding_pct": 35.714285714285715,
+    "sram_conflict_reduction_pct": 68.4
+  },
+  "quantum_bifurcation": {
+    "sba_runtime_ms": 3.1205001287162304,
+    "sa_runtime_ms": 266.17866097949445,
+    "speedup_x": 85.3,
+    "final_energy": -32.57722580511368,
+    "qaoa_approx_ratio": 0.892
+  },
+  "net_energy_reduction_pct": 25.62
+}

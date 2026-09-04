@@ -1,0 +1,13 @@
+## Strategy        Cost     Latency    DRAM    BW%    Idle    Feasible%
+
+Greedy          5669.65   3456.25    2226.24  86.74  353.10   51.61
+Lookahead       4168.69   3390.81    1649.04  88.09  287.72   54.83
+Beam Search     4169.26   3435.52    1383.84  87.71  332.39   51.61
+Annealing       4443.10   3488.46    1383.84  87.05  385.31   51.61
+Quantum         4439.67   3443.75    1649.04  87.43  340.64   54.83
+Quantum + APR   4943.55   3390.81    1649.04  88.09  287.72   54.83
+
+ANALYSIS:
+- Best overall method in this run is Lookahead (lowest total cost at 4168.69, with top-tier latency and feasibility).
+- Quantum + APR does not win on total cost here, but it improves execution behavior compared to Quantum baseline: lower latency (3390.81 vs 3443.75), lower idle (287.72 vs 340.64), and same feasibility (54.83%).
+- APR’s role is to increase pressure on repeatedly violated constraints. In this run, that produced smoother constraint behavior but also a large penalty_cost term, which raised final total cost.

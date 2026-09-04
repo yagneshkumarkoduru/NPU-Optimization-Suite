@@ -1,0 +1,44 @@
+[Greedy]
+Total cost 5669.65, latency 3456.25 cycles, feasibility 51.61%.
+Main contributors were DRAM pressure and Bandwidth congestion. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 670.00, spills 0.00, average utilization 0.72.
+Bandwidth profile: read util 86.74%, write util 66.50%, backlog pressure 0.99.
+Frontier mean during execution was 1.90.
+
+[Lookahead]
+Total cost 4168.69, latency 3390.81 cycles, feasibility 54.83%.
+Main contributors were DRAM pressure and Bandwidth congestion. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 680.00, spills 0.00, average utilization 0.69.
+Bandwidth profile: read util 88.09%, write util 66.58%, backlog pressure 0.64.
+Frontier mean during execution was 1.87.
+
+[Beam Search]
+Total cost 4169.26, latency 3435.52 cycles, feasibility 51.61%.
+Main contributors were Bandwidth congestion and DRAM pressure. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 710.00, spills 0.00, average utilization 0.70.
+Bandwidth profile: read util 87.71%, write util 66.53%, backlog pressure 0.88.
+Frontier mean during execution was 1.81.
+
+[Simulated Annealing]
+Total cost 4443.10, latency 3488.46 cycles, feasibility 51.61%.
+Main contributors were Bandwidth congestion and DRAM pressure. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 710.00, spills 0.00, average utilization 0.70.
+Bandwidth profile: read util 87.05%, write util 66.53%, backlog pressure 0.98.
+Frontier mean during execution was 1.77.
+
+[Quantum (QAOA)]
+Total cost 4439.67, latency 3443.75 cycles, feasibility 54.83%.
+Main contributors were DRAM pressure and Bandwidth congestion. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 680.00, spills 0.00, average utilization 0.68.
+Bandwidth profile: read util 87.43%, write util 66.58%, backlog pressure 0.73.
+Frontier mean during execution was 1.81.
+Quantum refinement used backend 'qaoa_style_multiwalker_simulator' with 7 walkers.
+
+[Quantum + APR]
+Total cost 4943.55, latency 3390.81 cycles, feasibility 54.83%.
+Main contributors were DRAM pressure and Bandwidth congestion. Fusion captured 5 pair merges and 1 triplet merges.
+Memory profile: peak SRAM 680.00, spills 0.00, average utilization 0.69.
+Bandwidth profile: read util 88.09%, write util 66.58%, backlog pressure 0.64.
+Frontier mean during execution was 1.87.
+APR trajectory: sram_capacity 1.24->1.64, bandwidth_capacity 14.00->14.00, bank_conflict 14.00->14.00.
+Quantum refinement used backend 'qaoa_style_multiwalker_simulator' with 7 walkers.

@@ -1,0 +1,157 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{Hardware-Aware NPU Scheduling with Adaptive Optimization and Quantum-Assisted Refinement}
+\author{Yagnesh Kumar Koduru}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Modern NPU compilers often pick schedules using fixed heuristics and a static cost model. That is usually fast, but in practice it can miss important interactions between memory pressure, bandwidth bursts, and execution stalls. We built this project around a simple question: can a lightweight research pipeline make better scheduling choices if it adapts penalties over time and then uses a hybrid quantum-style refinement step on top of classical search?
+
+Our answer is a practical ``yes, to some extent.'' The system is formulated as a principled attempt to go beyond greedy ordering with adaptive constraint handling and a secondary optimizer that explores harder-to-reach schedule variants.
+
+\section{System Overview}
+The system is intentionally classical-first. Most logic lives in a modular Python pipeline:
+\begin{itemize}
+    \item DAG construction from workload JSON.
+    \item Classical schedulers: Greedy, rollout-aware Lookahead, diversity-aware Beam Search, and reheated Simulated Annealing with tabu memory.
+    \item Hardware modeling: bank-aware SRAM residency, spill modeling, and dual-channel bandwidth with backlog dynamics.
+    \item Composite cost function with fusion, congestion backlog, and critical-path-aware parallelism effects.
+    \item Adaptive Penalty Refinement (APR) to reshape the objective as violations are observed.
+\end{itemize}
+
+The quantum layer is a refinement stage, not a replacement for classical scheduling. We use classical schedules as warm starts and apply a multi-walker QAOA-style search loop to improve local order decisions.
+
+\section{Scheduling Strategy}
+We compare multiple strategies because each has a different optimization bias:
+\begin{itemize}
+    \item Greedy gives a fast baseline driven by critical-path and memory-pressure priority.
+    \item Lookahead uses bounded tree search with rollout estimates, so each decision uses expected future cost instead of only local score.
+    \item Beam Search tracks multiple promising prefixes and explicitly enforces diversity in beam states.
+    \item Simulated Annealing uses multiple neighborhood operators, tabu filtering, and reheating when progress stalls.
+\end{itemize}
+
+In implementation, all schedules must remain DAG-feasible. This gives us a clean way to compare search behavior without mixing in invalid reorderings.
+
+\section{Hardware Constraints}
+The hardware model tracks the practical bottlenecks that usually dominate NPU behavior:
+\begin{itemize}
+    \item SRAM capacity, multi-bank conflicts, and selective eviction pressure.
+    \item DRAM access volume when reuse is not preserved, including spill and write-back behavior.
+    \item Per-operator read/write bandwidth demand on separate channels.
+    \item Pipeline stall amplification under overflow and backlog carry-over.
+\end{itemize}
+
+This is not a cycle-accurate simulator, but it is detailed enough to expose how schedule choices interact with limited on-chip memory and interconnect pressure.
+
+\section{Cost Function}
+We optimize the following objective:
+\[
+\text{Cost}(\pi)=
+\text{DRAM}_{access} +
+\text{SRAM}_{reuse\_loss} +
+\text{bandwidth}_{congestion} +
+\text{pipeline}_{stalls}
+- \text{fusion}_{gain} +
+\text{parallelism}_{loss}
+\]
+
+Intuitively, the schedule is good when it keeps data local, avoids bursty transfers, and keeps compute lanes busy. Fusion gain lowers cost when adjacent compatible operators can share intermediates. Parallelism loss penalizes schedules that serialize work even when parallel-ready nodes exist.
+
+\section{Adaptive Penalty Refinement}
+A static penalty setting tends to underreact in one region and overreact in another. APR updates each constraint penalty online:
+\[
+M_c \leftarrow M_c \cdot \exp(\text{violation\_rate} + \text{cost\_impact} + \text{constraint\_frequency})
+\]
+
+The three terms serve different roles:
+\begin{itemize}
+    \item \textbf{violation\_rate}: immediate signal of current failure intensity.
+    \item \textbf{cost\_impact}: whether the violated region is actually dominating total cost.
+    \item \textbf{constraint\_frequency}: persistence across rounds, which avoids forgetting recurring issues.
+\end{itemize}
+
+Why this helps: instead of hand-tuning constants once, the objective slowly reshapes itself around the observed behavior of the workload-hardware pair. In our pipeline, APR influences both classical warm-up search and the quantum-assisted stage.
+
+\section{Quantum Integration}
+The quantum component is intentionally smaller than the classical stack. We use a QAOA-style refinement loop as a secondary optimizer over feasible topological orders. Instead of a single chain, our implementation keeps multiple walkers and updates layer parameters according to observed acceptance behavior. The role of this module is exploratory: it starts from a classical warm start and tries to find lower-cost neighborhoods that deterministic heuristics may skip.
+
+For robustness, the implementation uses a simulator-style backend so the full project remains runnable in a normal Python environment.
+
+\section{End-to-End Flow}
+\begin{enumerate}
+    \item Load workload DAG and hardware/config parameters.
+    \item Generate classical schedules and evaluate cost terms.
+    \item Run APR updates from observed violations and cost impacts.
+    \item Execute quantum refinement with and without APR.
+    \item Save schedules, metrics table, and text explanations.
+\end{enumerate}
+
+Outputs are stored in \texttt{outputs/schedules.json}, \texttt{outputs/metrics.txt}, and \texttt{outputs/explanations.txt}.
+
+\section{Results and Observations}
+The experiment script produces side-by-side metrics for:
+\begin{itemize}
+    \item Greedy
+    \item Lookahead
+    \item Beam Search
+    \item Simulated Annealing
+    \item Quantum (QAOA)
+    \item Quantum + APR
+\end{itemize}
+
+A representative run on the provided workload produced the summary in Table~\ref{tab:mainresults}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Strategy & Cost & Latency & DRAM & BW(\%) & Feasible(\%) \\
+\midrule
+Greedy & 5669.65 & 3456.25 & 2226.24 & 86.74 & 51.61 \\
+Lookahead & 4168.69 & 3390.81 & 1649.04 & 88.09 & 54.83 \\
+Beam Search & 4169.26 & 3435.52 & 1383.84 & 87.71 & 51.61 \\
+Simulated Annealing & 4443.10 & 3488.46 & 1383.84 & 87.05 & 51.61 \\
+Quantum (QAOA) & 4439.67 & 3443.75 & 1649.04 & 87.43 & 54.83 \\
+Quantum + APR & 4943.55 & 3390.81 & 1649.04 & 88.09 & 54.83 \\
+\bottomrule
+\end{tabular}
+\caption{Comparison snapshot from \texttt{run\_experiment.py}.}
+\label{tab:mainresults}
+\end{table}
+
+Two practical patterns stood out. First, deeper classical search substantially reduced cost relative to greedy while keeping feasibility competitive. Second, the hybrid path with APR was more conservative: it stayed in safer memory/bandwidth regions but sometimes gave up raw cost to keep penalties aligned with repeated violations. This tradeoff was expected and confirms that APR is acting as a constraint-aware shaping mechanism, not only a score minimizer.
+
+\section{What Worked / What Didn't}
+\textbf{What worked well:}
+\begin{itemize}
+    \item Rollout lookahead and diversity-aware beam search gave stable gains over the pure greedy baseline.
+    \item Bank-aware memory and dual-channel bandwidth models made schedule differences much more visible.
+    \item APR reduced dependence on static penalty constants and reflected repeated hardware pressure patterns.
+    \item Multi-walker quantum refinement provided useful local improvements without replacing the classical core.
+\end{itemize}
+
+\textbf{What was limited:}
+\begin{itemize}
+    \item Hardware model is still approximate; no cycle-accurate pipeline simulation.
+    \item QAOA stage is simulator-style and small scale.
+    \item Search quality is workload-size sensitive; larger graphs need stronger pruning.
+\end{itemize}
+
+\section{Future Scope}
+Three directions look promising:
+\begin{itemize}
+    \item Learn a schedule prior from historical workloads to guide beam and annealing proposals.
+    \item Integrate operator tiling and placement decisions jointly with ordering.
+    \item Replace simulator-only quantum refinement with hardware-backed experiments and stronger QUBO formulations.
+\end{itemize}
+
+Overall, this project attempts to move beyond standard greedy or static scheduling by combining adaptive penalties with hybrid optimization. The key contribution is practical: a runnable system that explores improved scheduling strategies while staying grounded in hardware constraints.
+
+\end{document}
