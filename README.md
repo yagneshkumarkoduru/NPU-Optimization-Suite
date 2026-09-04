@@ -1,5 +1,6 @@
 # NPU Optimization Suite: Unified Hardware-Aware Compiler for Domain-Specific Neural Accelerators
 
+[![CI](https://github.com/yagneshkumarkoduru/NPU-Optimization-Suite/actions/workflows/ci.yml/badge.svg)](https://github.com/yagneshkumarkoduru/NPU-Optimization-Suite/actions)
 [![Target](https://img.shields.io/badge/Target-Heterogeneous%20NPUs%20%26%202.5D%20Chiplets-blue.svg)](#2-implementation-versions-architecture)
 [![Tier 1](https://img.shields.io/badge/Tier%201-Polyhedral%20Loop%20Tiling-059669.svg)](implementations/v1_polyhedral_loop_tiling/)
 [![Tier 2](https://img.shields.io/badge/Tier%202-Roofline%20DMA%20Double--Buffering-d97706.svg)](implementations/v2_roofline_dma_double_buffering/)

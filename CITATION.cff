@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software or research architecture in your work, please cite it as below."
+title: "NPU-Optimization-Suite: Unified Hardware-Aware Compiler for Domain-Specific Accelerators with Polyhedral Tiling and 2.5D UCIe Chiplets"
+authors:
+  - family-names: "Koduru"
+    given-names: "Yagnesh Kumar"
+    affiliation: "Esthien Labs"
+    orcid: "https://orcid.org/0009-0000-0000-0000"
+date-released: 2026-09-04
+repository-code: "https://github.com/yagneshkumarkoduru/NPU-Optimization-Suite"
+license: "MIT"
+keywords:
+  - "polyhedral loop tiling"
+  - "roofline model"
+  - "double buffering"
+  - "ucie chiplet"
+  - "speculative decoding"
+  - "npu compiler"
