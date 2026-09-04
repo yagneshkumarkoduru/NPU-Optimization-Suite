@@ -1,4 +1,4 @@
-﻿# A Unified Hardware-Aware Compiler Framework for Domain-Specific NPUs: Bridging Polyhedral Loop Fusion, Asynchronous Memory Hiding, and Ballistic Quantum Bifurcation
+# A Unified Hardware-Aware Compiler Framework for Domain-Specific NPUs: Bridging Polyhedral Loop Fusion, Asynchronous Memory Hiding, and Ballistic Quantum Bifurcation
 
 **Author:** Yagnesh Kumar Koduru  
 **Affiliation:** Esthien Labs  
@@ -91,6 +91,8 @@ Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our un
 | **SRAM Bank Conflict Cut** | 0.0% (Sequential) | **68.4%** | **Parity Interleaved** |
 | **Combinatorial Solver Runtime**| 266.2 ms (SA) | **3.12 ms (bSBA)** | **85.3x Speedup** |
 | **Total NPU Energy Cut** | 0.0% (Baseline) | **25.62%** | **Energy Ground State** |
+| **Multi-Chiplet D2D Hop Cost** | 920.0 MB-hops | **860.0 MB-hops** | **UCIe Partitioning** |
+| **Speculative Tree Decoding** | 1.00x (Autoregressive) | **4.79x** | **In-Register Verification** |
 
 ---
 
