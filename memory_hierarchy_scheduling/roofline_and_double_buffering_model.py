@@ -112,7 +112,7 @@ class DoubleBufferingSimulator:
         ax1.plot(tile_sizes, t_ser, 'r-o', markersize=4, label='Serial DMA -> Compute')
         ax1.plot(tile_sizes, t_pipe, 'b-s', markersize=4, label='Asynchronous Ping-Pong Double-Buffer')
         ax1.set_xlabel('Tile Buffer Size (KB)', fontweight='bold')
-        ax1.set_ylabel('Execution Latency per Tile ($\mu$s)', fontweight='bold')
+        ax1.set_ylabel(r'Execution Latency per Tile ($\mu$s)', fontweight='bold')
         ax1.set_title('Tile Execution Latency: Serial vs Double-Buffered', fontweight='bold')
         ax1.legend()
 

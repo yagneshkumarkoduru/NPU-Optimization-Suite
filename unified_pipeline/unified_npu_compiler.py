@@ -1,4 +1,4 @@
-﻿"""
+"""
 unified_npu_compiler.py
 =============================================================================
 Unified Hardware-Aware NPU Compiler & Optimization Engine
