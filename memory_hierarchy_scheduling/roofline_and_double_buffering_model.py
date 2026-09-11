@@ -72,33 +72,44 @@ class NPURooflineEngine:
 class DoubleBufferingSimulator:
     """
     Simulates asynchronous DMA ping-pong double-buffering latency hiding.
-    T_tile = max(T_DMA, T_Compute) + pipeline_overhead.
+
+    Models the same pipelined execution as the standalone double-buffering
+    engine (implementations/v2_roofline_dma_double_buffering/):
+        T_sync  = N * (T_dma + T_compute)                     (serial)
+        T_async = T_dma + (N-1) * max(T_dma, T_compute) + T_compute
+    with N tiles in flight. The default configuration (16 TFLOPS PEs,
+    64 GB/s DRAM, 208.33 FLOP/Byte tile intensity, 128 tiles) matches that
+    engine's benchmark tile (2.5e8 FLOPs, 1.2e6 bytes), so the computed
+    latency-hiding ratio is directly comparable to its 45.10% output.
     """
-    def __init__(self, dma_bandwidth_gb_s=64.0, pe_compute_throughput_gflops=8000.0):
+    def __init__(self, dma_bandwidth_gb_s=64.0, pe_compute_throughput_gflops=16000.0,
+                 ops_per_byte=2.5e8 / 1.2e6, num_tiles=128):
         self.dma_bw = dma_bandwidth_gb_s * 1e9
         self.pe_throughput = pe_compute_throughput_gflops * 1e9
+        self.ops_per_byte = ops_per_byte
+        self.num_tiles = num_tiles
 
     def evaluate_latency_hiding(self, tile_sizes_kb):
         serial_times = []
         double_buf_times = []
         hiding_efficiencies = []
+        n = self.num_tiles
 
         for tile_kb in tile_sizes_kb:
             bytes_tile = tile_kb * 1024
-            # 16 ops per byte (moderate intensity)
-            flops = bytes_tile * 16.0
+            flops = bytes_tile * self.ops_per_byte
 
             t_dma = bytes_tile / self.dma_bw
             t_compute = flops / self.pe_throughput
 
-            # Serial: fetch then compute
-            t_serial = t_dma + t_compute
-            # Ping-Pong Double-Buffer: max(DMA_next, Compute_current)
-            t_pipelined = max(t_dma, t_compute) * 1.05  # 5% synchronization overhead
+            # Serial: fetch then compute for every tile
+            t_serial_total = n * (t_dma + t_compute)
+            # Ping-pong pipeline: priming DMA + steady-state + drain compute
+            t_pipelined_total = t_dma + (n - 1) * max(t_dma, t_compute) + t_compute
 
-            serial_times.append(t_serial * 1e6)          # microseconds
-            double_buf_times.append(t_pipelined * 1e6)
-            efficiency = (t_serial - t_pipelined) / t_serial * 100.0
+            serial_times.append(t_serial_total * 1e6)          # microseconds
+            double_buf_times.append(t_pipelined_total * 1e6)
+            efficiency = (t_serial_total - t_pipelined_total) / t_serial_total * 100.0
             hiding_efficiencies.append(efficiency)
 
         return np.array(serial_times), np.array(double_buf_times), np.array(hiding_efficiencies)
@@ -166,6 +177,32 @@ class SRAMBankContentionModel:
         plt.close(fig)
         return filepath
 
+    @staticmethod
+    def compute_conflict_reduction(num_cores=8, num_banks=8):
+        """
+        Computes the reduction in bank arbitration conflict potential between
+        the uncoordinated Poisson access distribution and the bank-aware
+        scheduled placement. Conflict potential per bank is the number of
+        concurrently-arriving access pairs, C(n, 2), summed over all banks.
+        """
+        np.random.seed(42)
+        uncoordinated = np.random.poisson(lam=12, size=(num_cores, num_banks)).astype(float)
+        coordinated = np.zeros((num_cores, num_banks))
+        for core in range(num_cores):
+            primary_bank = core % num_banks
+            coordinated[core, primary_bank] = 24.0
+            coordinated[core, (primary_bank + 1) % num_banks] = 6.0
+            coordinated[core, :] += np.random.uniform(0.5, 1.5, size=num_banks)
+
+        def collision_potential(load):
+            per_bank = load.sum(axis=0)
+            return float(np.sum(per_bank * (per_bank - 1.0) / 2.0))
+
+        uncoord_potential = collision_potential(uncoordinated)
+        coord_potential = collision_potential(coordinated)
+        reduction_pct = (1.0 - coord_potential / uncoord_potential) * 100.0
+        return reduction_pct, uncoord_potential, coord_potential
+
 
 def run_memory_architecture_study():
     print("=" * 80)
@@ -177,7 +214,7 @@ def run_memory_architecture_study():
     p1 = roofline.generate_roofline_plot()
     print(f"[OK] Generated Roofline Model: {p1}")
 
-    double_buf = DoubleBufferingSimulator(dma_bandwidth_gb_s=64.0, pe_compute_throughput_gflops=8000.0)
+    double_buf = DoubleBufferingSimulator(dma_bandwidth_gb_s=64.0, pe_compute_throughput_gflops=16000.0)
     p2 = double_buf.generate_plot()
     print(f"[OK] Generated Double-Buffering Analysis: {p2}")
 
@@ -185,11 +222,18 @@ def run_memory_architecture_study():
     p3 = bank_model.generate_contention_heatmap()
     print(f"[OK] Generated SRAM Bank Contention Heatmap: {p3}")
 
+    # Computed key results (no hardcoded figures)
+    mean_hiding_pct = float(np.mean(double_buf.evaluate_latency_hiding(np.linspace(8, 256, 30))[2]))
+    conflict_reduction_pct, uncoord_potential, coord_potential = \
+        SRAMBankContentionModel.compute_conflict_reduction()
+
     print("-" * 80)
-    print("Key Results:")
-    print("  - Roofline Model: Arithmetic Intensity Knee = 250.0 FLOPs/Byte")
-    print("  - Average Memory Latency Hiding with Ping-Pong Double-Buffering: 46.8% latency reduction")
-    print("  - Bank-Aware Scheduling: 68.4% reduction in peak SRAM bank arbitration stalls")
+    print("Key Results (computed by this model, not hardcoded):")
+    print(f"  - Roofline Model: Arithmetic Intensity Knee = {roofline.knee_intensity:.1f} FLOPs/Byte")
+    print(f"  - Average Memory Latency Hiding with Ping-Pong Double-Buffering: {mean_hiding_pct:.2f}% "
+          f"(128-tile pipeline @ {double_buf.ops_per_byte:.1f} FLOP/B, 16 TFLOPS / 64 GB/s)")
+    print(f"  - Bank-Aware Scheduling: {conflict_reduction_pct:.1f}% reduction in bank arbitration conflict potential "
+          f"(Poisson access model: {uncoord_potential:.0f} -> {coord_potential:.0f} collision pairs)")
     print("=" * 80)
 
 

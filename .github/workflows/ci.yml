@@ -21,20 +21,24 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy scipy matplotlib pyyaml
+          pip install numpy scipy matplotlib pyyaml pytest
 
       - name: Bytecode Syntax Compilation Check
         run: |
           python -m compileall implementations/ unified_pipeline/
 
-      - name: Run Tier 1 Polyhedral Tiling Engine
+      - name: Run Polyhedral Loop Tiling Engine
         run: |
           python implementations/v1_polyhedral_loop_tiling/polyhedral_tiling_engine.py
 
-      - name: Run Tier 2 Roofline Double-Buffering Engine
+      - name: Run Roofline Double-Buffering Engine
         run: |
           python implementations/v2_roofline_dma_double_buffering/roofline_double_buffering_engine.py
 
-      - name: Run Tier 3 UCIe Chiplet & Speculative Pass
+      - name: Run UCIe Chiplet & Speculative Pass
         run: |
           python implementations/v3_ucie_chiplet_speculative_decoding/chiplet_speculative_compiler.py
+
+      - name: Run Pytest Suite
+        run: |
+          python -m pytest -q tests/

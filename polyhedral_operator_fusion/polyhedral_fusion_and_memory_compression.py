@@ -104,6 +104,11 @@ class PolyhedralFusionEngine:
         return filepath, peak_unfused, peak_fused, reduction
 
     def generate_speedup_breakdown_plot(self):
+        # Analytical fusion-pattern model (NOT measured hardware benchmarks).
+        # Each entry is a roofline-derived projection for a representative
+        # fused pattern: (pattern, projected speedup vs unfused, projected
+        # DRAM traffic eliminated pct). Regenerated figures must cite this
+        # table as a model, not as silicon measurements.
         fusion_patterns = [
             ("Conv + BN + ReLU", 1.85, 68.2),
             ("Conv + Add + HardSwish", 2.15, 74.5),
@@ -112,6 +117,7 @@ class PolyhedralFusionEngine:
             ("MLP Linear + GELU", 1.90, 62.5),
             ("LayerNorm + Residual Add", 1.75, 58.0)
         ]
+        self.fusion_patterns = fusion_patterns
 
         names = [p[0] for p in fusion_patterns]
         speedups = [p[1] for p in fusion_patterns]
@@ -123,14 +129,14 @@ class PolyhedralFusionEngine:
         fig, ax1 = plt.subplots(figsize=(9.0, 5.0))
         ax2 = ax1.twinx()
 
-        rects1 = ax1.bar(x - width/2, speedups, width, label='Execution Speedup (x)', color='#2980B9')
-        rects2 = ax2.bar(x + width/2, sram_savings, width, label='DRAM Traffic Reduction (%)', color='#27AE60')
+        rects1 = ax1.bar(x - width/2, speedups, width, label='Projected Execution Speedup (x)', color='#2980B9')
+        rects2 = ax2.bar(x + width/2, sram_savings, width, label='Projected DRAM Traffic Reduction (%)', color='#27AE60')
 
-        ax1.set_ylabel('Execution Speedup vs Unfused', fontweight='bold', color='#2980B9')
-        ax2.set_ylabel('DRAM Traffic Eliminated (%)', fontweight='bold', color='#27AE60')
+        ax1.set_ylabel('Projected Execution Speedup vs Unfused', fontweight='bold', color='#2980B9')
+        ax2.set_ylabel('Projected DRAM Traffic Eliminated (%)', fontweight='bold', color='#27AE60')
         ax1.set_xticks(x)
         ax1.set_xticklabels(names, rotation=25, ha='right', fontweight='bold')
-        ax1.set_title('Kernel Fusion Benchmarks: Execution Speedup & Memory Traffic Savings', fontweight='bold', pad=12)
+        ax1.set_title('Kernel Fusion Model Projections: Speedup & Memory Traffic Savings (Analytical, Not Measured)', fontweight='bold', pad=12)
 
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
@@ -155,11 +161,17 @@ def run_fusion_optimization_study():
     p2 = engine.generate_speedup_breakdown_plot()
     print(f"[OK] Fusion Speedup Breakdown Plot saved: {p2}")
 
+    # Aggregate statistics computed from the analytical fusion-pattern model
+    pattern_speedups = [p[1] for p in engine.fusion_patterns]
+    pattern_traffic_cuts = [p[2] for p in engine.fusion_patterns]
+    avg_modeled_speedup = float(np.mean(pattern_speedups))
+    peak_modeled_traffic_cut = float(np.max(pattern_traffic_cuts))
+
     print("-" * 80)
     print("Polyhedral Subgraph Rewriting Verdict:")
     print(f"  - Peak Live SRAM Footprint reduced by {reduction:.1f}% (Safely below 512 KB hardware limit)")
-    print("  - Average End-to-End Kernel Execution Speedup: 1.95x")
-    print("  - Peak DRAM Traffic Reduction: up to 81.0% on Multi-Head Attention blocks")
+    print(f"  - Average projected kernel execution speedup: {avg_modeled_speedup:.2f}x (analytical fusion-pattern model)")
+    print(f"  - Peak projected DRAM traffic reduction: {peak_modeled_traffic_cut:.1f}% (model upper bound, Self-Attention pattern)")
     print("=" * 80)
 
 

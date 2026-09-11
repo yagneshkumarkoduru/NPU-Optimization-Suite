@@ -17,11 +17,11 @@ Accelerating deep learning workloads on domain-specific Neural Processing Units 
 Historically, compilers treat these three layers as independent, decoupled optimization passes, introducing severe phase-ordering pathologies.
 
 In this work, we present the **NPU Hardware-Aware Optimization Suite**, a unified multi-paradigm compiler architecture that couples polyhedral loop transformation, asynchronous DMA double-buffering, and quantum-inspired combinatorial optimization into a single cohesive compilation pipeline. Our framework delivers:
-- An analytical polyhedral loop tiling and in-register streaming engine that compresses peak live activation SRAM requirements by **90.7%** and eliminates up to **81.0%** of off-chip DRAM traffic;
-- An NPU Roofline analytical model with multi-tier SRAM residency that identifies operational intensity bounds ($I^* = 250.0\text{ FLOP/B}$) and allocates asynchronous DMA ping-pong buffers, hiding **46.8%** of memory latency while reducing 8-bank SRAM access conflicts by **68.4%**; and
-- A non-linear Kerr-oscillator Ballistic Simulated Bifurcation Algorithm (bSBA) solver that achieves an **85.3x** speedup over classical simulated annealing, verified against a 2D variational Quantum Approximate Optimization Algorithm (QAOA) statevector engine ($0.892$ ground-state approximation ratio).
+- An analytical polyhedral loop tiling and in-register streaming engine that compresses peak live activation SRAM requirements by **90.7%** and reduces off-chip DRAM traffic by **73.29x** under a mixed-precision (INT8/INT32) footprint model;
+- An NPU Roofline analytical model with multi-level SRAM residency that identifies operational intensity bounds ($I^* = 250.0\text{ FLOP/B}$) and allocates asynchronous DMA ping-pong buffers, hiding **45.10%** of memory latency while cutting 8-bank SRAM access conflicts by **68.48%** in the scheduling benchmark (184 to 58 conflicts); and
+- A non-linear Kerr-oscillator Ballistic Simulated Bifurcation Algorithm (bSBA) solver evaluated in three measured configurations on the same 32-variable Ising instance (CPU-hosted reference implementations, timings vary run to run): a single 150-step trajectory takes **1.6-2.1 ms** but reaches only **-33.6** energy, while **best-of-8 restarts plus a 1-opt Ising-energy polish** takes **12.9-14.4 ms** and ties the **400-sweep simulated annealing** baseline's best energy (**-42.76**) that requires 28.2-41.0 ms, i.e. SA-matching solution quality at **2.2-2.5x less wall time** across paired runs; a QAOA depth sweep (p = 1, 2, 3, 2p-parameter multi-start COBYLA) against the exhaustive $2^{14}$ ground state measures approximation ratios **0.433 / 0.595 / 0.694** (best at p=3), and the p=1 landscape engine achieves a **0.481** ratio on a separately verified 12-spin subinstance exhaustive over $2^{12}$ states.
 
-Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our unified compiler reduces end-to-end NPU dynamic energy dissipation by **25.62%** while delivering a **1.95x** kernel speedup, establishing a comprehensive standard for hardware-aware compiler engineering.
+Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our unified compiler eliminates **27.78%** of DRAM traffic in the fusion pipeline (translating directly into off-chip DRAM dynamic-energy relief), cuts multi-chiplet D2D interconnect energy by **37.81%** (0.5 pJ/bit model), and reduces compilation schedule cost by **25.62%** against the greedy baseline (energy-objective formulation, dimensionless cost units), establishing a comprehensive standard for hardware-aware compiler engineering.
 
 ---
 
@@ -52,8 +52,10 @@ Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our un
 │  Phase 3: Ballistic Simulated Bifurcation (bSBA) Optimization│
 │  - Non-linear Kerr Hamiltonian dynamics                     │
 │  - Symplectic integration with ballistic wall boundary      │
-│  - 85.3x speedup over classical simulated annealing         │
-│  - 2D Variational QAOA ground-state verification (r = 0.892)│
+│  - Best-of-8 restarts + 1-opt polish: SA-quality energy     │
+│    (-42.76) at 2.2-2.5x less wall time than SA              │
+│  - QAOA p=1,2,3 exact statevector sweep (r = 0.694 best,    │
+│    n=14 exhaustive; landscape engine r = 0.481, n=12)       │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
@@ -65,19 +67,19 @@ Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our un
 ## 2. Integrated Subsystems & Quantitative Highlights
 
 ### Subsystem 1: Memory Hierarchy Scheduling (`memory_hierarchy_scheduling/`)
-- **NPU Roofline Modeling:** Identified operational intensity knee $I^* = 250.0\text{ FLOP/B}$.
-- **Ping-Pong Double Buffering:** Overlaps DMA transfers with arithmetic execution, hiding **46.8% memory latency**.
-- **8-Bank SRAM Contention Modeling:** Hash-interleaved addressing reduces bank access conflicts by **68.4%** and compilation cost by **26.47%**.
+- **NPU Roofline Modeling:** Identified operational intensity knee $I^* = 250.0\text{ FLOP/B}$ (computed).
+- **Ping-Pong Double Buffering:** Overlaps DMA transfers with arithmetic execution, hiding **45.10% memory latency** (computed with the same 128-tile pipeline parameters as the double-buffering engine).
+- **8-Bank SRAM Contention Modeling:** Hash-interleaved addressing reduces bank access conflicts by **68.48%** (184 to 58 conflicts) and compilation cost by **26.47%** against the greedy baseline in the scheduling benchmark.
 
 ### Subsystem 2: Polyhedral Operator Fusion (`polyhedral_operator_fusion/`)
 - **Polyhedral Loop Tiling:** Fused Conv-BatchNorm-ReLU-Add kernels stream directly through register files.
-- **Peak Live SRAM Compression:** Reduces peak buffer allocation from $3840\text{ KB}$ down to $358.4\text{ KB}$ (**90.7% compression**).
-- **DRAM Traffic Elimination:** Eradicates up to **81.0%** of external memory bus traffic, yielding a **1.95x kernel speedup**.
+- **Peak Live SRAM Compression:** Reduces peak buffer allocation from $3840\text{ KB}$ down to $358.4\text{ KB}$ (**90.7% compression**, computed by the fusion simulator).
+- **Analytical Fusion-Model Projections:** The fusion-pattern model projects up to **81.0%** DRAM traffic elimination and an average **1.95x** kernel speedup across representative fused patterns (analytical projections, not silicon measurements); the unified pipeline's roofline calculation yields a **1.38x** attainable-performance kernel speedup on its 4-layer workload.
 
 ### Subsystem 3: Quantum Bifurcation & QAOA (`quantum_bifurcation_qaoa/`)
-- **Ballistic Simulated Bifurcation Algorithm (bSBA):** Non-linear adiabatic bifurcation physics delivering **85.3x speedup** over classical simulated annealing.
-- **Variational QAOA Landscape:** 2D parameter space grid exploration achieving **0.892 ground-state approximation ratio**.
-- **Net Dynamic Energy Cut:** **25.62% reduction** in total NPU energy dissipation.
+- **Ballistic Simulated Bifurcation Algorithm (bSBA):** Non-linear adiabatic bifurcation physics, measured in a three-way comparison on the same 32-variable Ising instance (CPU-hosted reference implementations; timings vary run to run): single-run bSBA reaches **-33.6** energy in 1.6-2.1 ms; bSBA with **best-of-8 restarts** (deterministic seed ramp) plus a **feasibility-preserving 1-opt Ising-energy polish** reaches **-42.76** in 12.9-14.4 ms total; simulated annealing (400 sweeps) reaches **-42.76** in 28.2-41.0 ms. The raw single trajectory is therefore quantifiably worse than SA, while the restarts+polish configuration ties SA's solution quality at 2.2-2.5x less wall time across paired runs.
+- **Variational QAOA Depth Sweep:** Exact p = 1, 2, 3 QAOA statevector expectation with 2p-parameter multi-start COBYLA against the exhaustive $2^{14}$ ground state of the pipeline subinstance, measuring approximation ratios **0.433 (p=1), 0.595 (p=2), 0.694 (p=3)**. The dedicated landscape engine additionally achieves a **0.481 ground-state approximation ratio** on a 12-spin subinstance verified exhaustively over $2^{12}$ states.
+- **Scheduling Cost Reduction:** **25.62% cut** in the energy-objective scheduling cost against the greedy baseline (4216.92 vs 5669.65, dimensionless cost units).
 
 ---
 
@@ -86,13 +88,15 @@ Across diverse neural workloads (ResNet, MobileNet, Vision Transformers), our un
 | Optimization Metric | Baseline Heuristic | NPU Optimization Suite (Ours) | Breakthrough Factor |
 | :--- | :---: | :---: | :---: |
 | **Peak Live Activation SRAM** | 3840.0 KB | **358.4 KB** | **90.7% Compression** |
-| **Kernel Speedup** | 1.00x | **1.95x** | **+95.0% Throughput** |
-| **Memory Latency Hidden** | 0.0% (Blocking) | **46.8%** | **Asynchronous Overlap** |
-| **SRAM Bank Conflict Cut** | 0.0% (Sequential) | **68.4%** | **Parity Interleaved** |
-| **Combinatorial Solver Runtime**| 266.2 ms (SA) | **3.12 ms (bSBA)** | **85.3x Speedup** |
-| **Total NPU Energy Cut** | 0.0% (Baseline) | **25.62%** | **Energy Ground State** |
-| **Multi-Chiplet D2D Hop Cost** | 920.0 MB-hops | **860.0 MB-hops** | **UCIe Partitioning** |
-| **Speculative Tree Decoding** | 1.00x (Autoregressive) | **4.79x** | **In-Register Verification** |
+| **Kernel Speedup (roofline-derived)** | 1.00x | **1.38x** | **Attainable-Performance Ratio** |
+| **Memory Latency Hidden** | 0.0% (Blocking) | **45.10%** | **Asynchronous Overlap** |
+| **SRAM Bank Conflict Cut** | 184 conflicts | **58 conflicts** | **68.48% Fewer Conflicts** |
+| **Combinatorial Solver Runtime**| 28.2-41.0 ms (SA, 400 sweeps) | **12.9-14.4 ms (bSBA, 8 restarts + polish)** | **SA-Quality Energy (-42.76) at 2.2-2.5x Less Time** |
+| **Scheduling Cost (energy-objective)** | 5669.65 (Greedy) | **4216.92** | **25.62% Cost Cut** |
+| **Multi-Chiplet D2D Hop Cost** | 3,200 MB-hops | **1,990 MB-hops** | **37.81% UCIe Relief** |
+| **Speculative Tree Decoding** | 1.00x (Autoregressive) | **4.79x (in-register)** / **1.91x (end-to-end)** | **Tree Verification** |
+
+Scope note: the polyhedral tiling comparison is against in-repo classical tiling baselines (no-tiling, naive fixed 32x32x32 grid, and greedy power-of-two blocking within 80% of SRAM) computed with the engine's own INT8/INT32 cost model in `baselines/classical_tiling_baselines.py`; external production-compiler baselines (TVM/XLA/MLIR) remain future work, with an optional TVM comparison harness provided in `baselines/tvm_comparison_harness.py`.
 
 ---
 

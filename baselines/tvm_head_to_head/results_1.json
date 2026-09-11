@@ -1,0 +1,15 @@
+{
+  "workload": "1024^3 int8*int8->int32 GEMM (single batch)",
+  "threads_setting": "1",
+  "tvm_version": "0.26.0",
+  "auto_scheduler_trials": 40,
+  "engine_tile": [
+    64,
+    128,
+    128
+  ],
+  "host_cores": 16,
+  "tvm_hand_tile_s": 1.0665528666666668,
+  "tvm_auto_error": "'JSONDatabase' object has no attribute 'mod'",
+  "numpy_f32_s": 0.024857199998223223
+}

@@ -8,3 +8,4 @@
 *.toc
 *.out
 *.log
+baselines/tvm_head_to_head/artifacts/

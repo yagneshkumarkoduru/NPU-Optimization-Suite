@@ -1,8 +1,8 @@
-# Tier 1 Implementation: Polyhedral Loop Tiling & Affine TVM-TIR Compiler Pass
+# Polyhedral Loop Tiling & Affine TVM-TIR Compiler Pass (NPU Optimization Suite Component)
 
 ## 1. Overview
 
-Tier 1 targets polyhedral loop nest optimization for deep learning kernels (e.g. GEMM, Conv2D, Self-Attention projections). It formulates iteration spaces as integer convex polyhedra, eliminates loop bounds redundancies via Fourier-Motzkin elimination, and optimizes 3D tile dimensions $(T_i, T_j, T_k)$ to maximize operational intensity within a parameterizable L1 Scratchpad ($64\text{ KB}$).
+This component targets polyhedral loop nest optimization for deep learning kernels (e.g. GEMM, Conv2D, Self-Attention projections). It formulates iteration spaces as integer convex polyhedra, eliminates loop bounds redundancies via Fourier-Motzkin elimination, and optimizes 3D tile dimensions $(T_i, T_j, T_k)$ to maximize operational intensity within a parameterizable L1 Scratchpad ($64\text{ KB}$).
 
 ```
                          Original Nested Loops
@@ -64,8 +64,8 @@ Execute the standalone polyhedral tiling engine:
 python implementations/v1_polyhedral_loop_tiling/polyhedral_tiling_engine.py
 ```
 
-### Verified Empirical Performance:
-- **Optimal Tile Dimensions**: $T_i = 128, T_j = 128, T_k = 16$
-- **On-Chip L1 Footprint**: $40.0\text{ KB} \le 64.0\text{ KB}$
-- **DRAM Traffic Reduction**: **$60.29\times$ reduction** ($2.15\text{ GB} \to 0.04\text{ GB}$)
-- **Effective L1 Cache Hit Rate**: **$99.17\%$**
+### Verified Empirical Performance (computed 2026-09-10, mixed-precision INT8/INT32 footprint model):
+- **Optimal Tile Dimensions**: $T_i = 64, T_j = 128, T_k = 128$
+- **On-Chip L1 Footprint**: $56.0\text{ KB} \le 64.0\text{ KB}$
+- **DRAM Traffic Reduction**: **$73.29\times$ reduction** ($2.15\text{ GB} \to 0.03\text{ GB}$)
+- **Effective L1 Cache Hit Rate**: **$98.64\%$**

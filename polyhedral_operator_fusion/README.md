@@ -17,7 +17,7 @@ This repository implements an automated **Graph-Rewriting & Polyhedral Loop Fusi
 1. **Vertical & Horizontal Kernel Fusion**: Identifies multi-operator chains (Conv+BN+ReLU, Conv+Add+HardSwish, QKV projection chunking) and fuses their iteration spaces into unified compute kernels.
 2. **Activation Buffer Materialization Elimination**: Streams intermediate tensor elements directly through processor register files, slashing peak SRAM live activation footprint from **$3840.0\text{ KB}$ down to $358.4\text{ KB}$ ($90.7\%$ memory compression)**, bringing large Transformer and MobileNet blocks well within strict on-chip SRAM capacity limits.
 3. **Adaptive Penalty Refinement (APR)**: Dynamically scales Lagrangian multipliers across compilation epochs, enforcing zero hardware constraint violations.
-4. **End-to-End Throughput Speedup**: Delivers an average **$1.95\times$ kernel execution speedup** and up to **$81.0\%$ reduction in DRAM traffic**.
+4. **Projected Throughput Speedup**: The analytical fusion-pattern model projects an average **$1.95\times$ kernel execution speedup** and up to **$81.0\%$ DRAM traffic elimination** across representative fused patterns (model projections, not measured hardware benchmarks).
 
 ---
 
@@ -66,16 +66,18 @@ Where $\mathcal{V}_k^{(m)}$ is the empirical violation rate and $\mathcal{I}_k^{
   <img src="outputs/fig_fusion_speedup_breakdown.png" alt="Fusion Speedup Breakdown" width="48%" />
 </p>
 
-### Fusion Pattern Speedup & DRAM Savings:
+### Fusion Pattern Speedup & DRAM Savings (analytical model projections, NOT silicon measurements; source: `polyhedral_fusion_and_memory_compression.py`, `generate_speedup_breakdown_plot()`):
 
-| Operator Fusion Pattern | Unfused Latency ($\mu$s) | Fused Latency ($\mu$s) | Execution Speedup | DRAM Traffic Eliminated (%) | Peak SRAM Saving |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Conv + BN + ReLU** | 1.90 | 1.03 | **1.85x** | 68.2% | 256 KB |
-| **Conv + Add + HardSwish** | 3.10 | 1.44 | **2.15x** | 74.5% | 512 KB |
-| **QKV Split-Projection** | 4.20 | 2.59 | **1.62x** | 54.0% | 768 KB |
-| **Self-Attention Fused Scale** | 5.90 | 2.46 | **2.40x** | **81.0%** | 1024 KB |
-| **MLP Linear + GELU** | 5.90 | 3.10 | **1.90x** | 62.5% | 1024 KB |
-| **LayerNorm + Residual Add** | 1.40 | 0.80 | **1.75x** | 58.0% | 384 KB |
+| Operator Fusion Pattern | Projected Execution Speedup | Projected DRAM Traffic Eliminated (%) | Modeled Peak SRAM Saving |
+| :--- | :---: | :---: | :---: |
+| **Conv + BN + ReLU** | **1.85x** | 68.2% | 256 KB |
+| **Conv + Add + HardSwish** | **2.15x** | 74.5% | 512 KB |
+| **QKV Split-Projection** | **1.62x** | 54.0% | 768 KB |
+| **Self-Attention Fused Scale** | **2.40x** | **81.0%** | 1024 KB |
+| **MLP Linear + GELU** | **1.90x** | 62.5% | 1024 KB |
+| **LayerNorm + Residual Add** | **1.75x** | 58.0% | 384 KB |
+
+The **90.7% peak live SRAM compression** (3840.0 KB to 358.4 KB) is computed by the fusion simulator's live-memory analysis. The per-pattern speedup and DRAM-traffic figures in the table above are analytical roofline-derived projections from the fusion-pattern model, not measured hardware benchmarks; the measured per-pattern latencies are not instrumented in this repository.
 
 ---
 

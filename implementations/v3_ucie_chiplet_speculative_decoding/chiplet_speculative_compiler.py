@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-=============================================================================
-Heterogeneous 2.5D/3D UCIe Chiplet Interconnect & Speculative Decoding Pass
-Project: NPU Optimization Suite (Tier 3 Implementation)
-Author: Yagnesh Kumar Koduru (Esthien Labs)
-Domain: Chiplet Packaging, UCIe D2D Interconnect, LLM Speculative Decoding
-=============================================================================
+ =============================================================================
+ Heterogeneous 2.5D/3D UCIe Chiplet Interconnect & Speculative Decoding Pass
+ Project: NPU Optimization Suite (UCIe Chiplet Speculative Decoding component)
+ Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Domain: Chiplet Packaging, UCIe D2D Interconnect, LLM Speculative Decoding
+ =============================================================================
 """
 
-import os
-import sys
 import itertools
 import numpy as np
 
@@ -67,6 +65,13 @@ class ChipletSpeculativeCompiler:
         energy_base_uj = (total_bits_base * self.d2d_energy_pj) / 1e6
         energy_opt_uj = (total_bits_opt * self.d2d_energy_pj) / 1e6
 
+        # Wire the UCIe bandwidth into the model: serialized transfer latency
+        # of the optimized traffic over the D2D link (MB * hops -> bytes).
+        transfer_latency_base_us = (base_cost * 1e6) / (self.ucie_bw * 1e9) * 1e6
+        transfer_latency_opt_us = (best_cost * 1e6) / (self.ucie_bw * 1e9) * 1e6
+        # Effective per-hop D2D energy per MB transferred over the link
+        energy_per_mb_hop_pj = self.d2d_energy_pj * 8 * 1e6
+
         return {
             "base_d2d_mb_hops": int(base_cost),
             "opt_d2d_mb_hops": int(best_cost),
@@ -74,7 +79,10 @@ class ChipletSpeculativeCompiler:
             "traffic_reduction_pct": (1.0 - best_cost / base_cost) * 100.0,
             "energy_base_uj": energy_base_uj,
             "energy_opt_uj": energy_opt_uj,
-            "energy_savings_pct": (1.0 - energy_opt_uj / energy_base_uj) * 100.0
+            "energy_savings_pct": (1.0 - energy_opt_uj / energy_base_uj) * 100.0,
+            "transfer_latency_base_us": transfer_latency_base_us,
+            "transfer_latency_opt_us": transfer_latency_opt_us,
+            "energy_per_mb_hop_pj": energy_per_mb_hop_pj
         }
 
     def simulate_speculative_decoding(self, gamma=4, acceptance_rate=0.78, draft_lat_ms=3.2, target_lat_ms=18.5):
@@ -108,7 +116,7 @@ class ChipletSpeculativeCompiler:
 
 def run_benchmark():
     print("=" * 70)
-    print("  NPU OPTIMIZATION SUITE: TIER 3 2.5D CHIPLET & SPECULATIVE COMPILER")
+    print("  NPU OPTIMIZATION SUITE: UCIe CHIPLET & SPECULATIVE COMPILER")
     print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
     print("=" * 70)
     
@@ -123,6 +131,7 @@ def run_benchmark():
     print(f"  Cross-Die Traffic Reduction : {qap['traffic_reduction_pct']:.2f}% Inter-Die Bandwidth Relief")
     print(f"  Baseline D2D Energy         : {qap['energy_base_uj']:.2f} uJ")
     print(f"  Optimized D2D Energy        : {qap['energy_opt_uj']:.2f} uJ ({qap['energy_savings_pct']:.2f}% Energy Savings)")
+    print(f"  D2D Transfer Latency        : {qap['transfer_latency_base_us']:.2f} -> {qap['transfer_latency_opt_us']:.2f} us @ {compiler.ucie_bw:.0f} GB/s UCIe")
     
     # 2. Speculative Tree Decoding Pass
     spec = compiler.simulate_speculative_decoding(gamma=4, acceptance_rate=0.78)

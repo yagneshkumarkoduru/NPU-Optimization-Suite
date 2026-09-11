@@ -16,9 +16,9 @@ Scheduling deep neural network execution graphs onto heterogeneous multi-core NP
 
 This repository formulates a **quantum-classical hybrid compilation and optimization framework**:
 1. **Coupled Ising Energy Hamiltonian Formulation**: Maps operator topological placement variables $x_{i,t} \in \{0, 1\}$ into an Ising-equivalent spin Hamiltonian capturing unary execution costs, pairwise tensor data-reuse rewards, and quadratic bank contention penalties.
-2. **Ballistic Simulated Bifurcation Algorithm (bSBA)**: Simulates non-linear Kerr parametric oscillator dynamics to achieve sub-second binary spin phase transitions, attaining an **$85.3\times$ speedup** over classical Simulated Annealing on dense graph instances.
-3. **Variational Quantum Approximate Optimization Algorithm (QAOA)**: Maps operator dependency Hamiltonians to parameterized quantum circuits ($U(\beta, \gamma) = e^{-i \beta \hat{H}_M} e^{-i \gamma \hat{H}_P}$), achieving an empirical **$0.892$ ground-state approximation ratio** on 2-parameter variational surfaces.
-4. **Adaptive Constraint Enforcement**: Integrates Adaptive Penalty Refinement (APR) to drive valid schedule feasibility to **$58.06\%$** with a **$25.62\%$ total energy reduction**.
+2. **Ballistic Simulated Bifurcation Algorithm (bSBA)**: Simulates non-linear Kerr parametric oscillator dynamics to achieve sub-second binary spin phase transitions. Measured three-way comparison on the 32-variable unified-pipeline Ising instance (CPU-hosted reference implementations; timings vary run to run, see [`EVIDENCE.md`](../EVIDENCE.md)): a single 150-step trajectory (1.6-2.1 ms) reaches -33.6 energy; best-of-8 restarts plus a 1-opt Ising-energy polish (12.9-14.4 ms) ties the 400-sweep simulated annealing baseline's best energy (-42.76; SA takes 28.2-41.0 ms), i.e. SA-matching quality at 2.2-2.5x less wall time across paired runs.
+3. **Variational Quantum Approximate Optimization Algorithm (QAOA)**: Maps operator dependency Hamiltonians to parameterized quantum circuits ($U(\beta, \gamma) = e^{-i \beta \hat{H}_M} e^{-i \gamma \hat{H}_P}$), achieving an exact-statevector **$0.481$ ground-state approximation ratio** on a 12-spin subinstance verified exhaustively over $2^{12}$ states.
+4. **Adaptive Constraint Enforcement**: Integrates Adaptive Penalty Refinement (APR) to drive valid schedule feasibility to **$58.06\%$** with a **$25.62\%$ scheduling-cost reduction** against the greedy baseline (energy-objective formulation; dimensionless cost units, not joules).
 
 ---
 
@@ -77,15 +77,17 @@ $$\min_{\gamma, \beta} \langle \psi(\gamma, \beta) | \hat{\mathcal{H}}_P | \psi(
   <img src="outputs/fig_qaoa_energy_landscape_surface.png" alt="QAOA Energy Landscape Surface" width="48%" />
 </p>
 
-### Solver Performance & Scaling Comparison:
+### Solver Cost Comparison (synthetic scheduling benchmark; costs and feasibility from `outputs/metrics.txt` / `outputs/explanations.txt`):
 
-| Solver Architecture | Execution Time ($N=128$) | Energy Cost (Normalized) | Ground-State Approximation Ratio | Feasible Schedules (%) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Greedy Baseline** | 4.2 ms | 1.000 (5669.65) | 0.735 | 51.61% |
-| **Classical Simulated Annealing (Static $\lambda$)** | 1240.0 ms | 0.814 (4443.10) | 0.841 | 12.40% (unstable) |
-| **Simulated Annealing + APR** | 1310.0 ms | 0.768 (4168.69) | 0.875 | 54.83% |
-| **Ballistic Simulated Bifurcation (bSBA)** | **14.5 ms** | **0.751 (4180.20)** | **0.888** | **57.40% (85.3x speedup)** |
-| **Quantum QAOA ($p=1$) + APR** | **Statevector Sim** | **0.744 (4216.92)** | **0.892** | **58.06% (25.62% energy cut)** |
+| Solver Architecture | Energy Cost (Normalized) | Feasible Schedules (%) |
+| :--- | :---: | :---: |
+| **Greedy Baseline** | 1.000 (5669.65) | 51.61% |
+| **Classical Simulated Annealing (Static $\lambda$)** | 0.814 (4443.10) | 51.61% |
+| **Simulated Annealing + APR** | 0.768 (4168.69) | 54.83% |
+| **Quantum QAOA ($p=1$)** | 0.822 (4439.67) | 54.83% |
+| **Quantum QAOA ($p=1$) + APR (energy formulation)** | **0.744 (4216.92)** | **58.06%** |
+
+Measured solver timings and the QAOA approximation ratio come from the dedicated solver benchmark (`simulated_bifurcation_and_qaoa_landscape.py`) and the unified pipeline (`unified_pipeline/unified_npu_compiler.py`): bSBA vs simulated annealing wall-clock speedup is approximately 2.8-4.3x on the 16-spin landscape instance, while on the 32-variable unified-pipeline instance the restarts+polish configuration ties SA quality (-42.76) at 2.2-2.5x less wall time across paired runs (single-trajectory bSBA is 1.6-2.1 ms but reaches a worse -33.6 energy; CPU-hosted reference implementations, timings vary run to run). The exact-statevector p=1 QAOA approximation ratio is 0.481 on a 12-spin subinstance (exhaustive $2^{12}$ ground-state verification), and the unified pipeline's depth sweep measures 0.433 (p=1), 0.595 (p=2), 0.694 (p=3) on a 14-spin subinstance against the exhaustive $2^{14}$ ground state. Costs are dimensionless composite scheduling-cost units, not joules.
 
 ---
 

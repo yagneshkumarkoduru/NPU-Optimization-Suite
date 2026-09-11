@@ -1,4 +1,4 @@
-# NPU-Memory-Aware-Scheduling: Roofline Analysis, Double-Buffering & Multi-Tier SRAM Simulation
+# NPU-Memory-Aware-Scheduling: Roofline Analysis, Double-Buffering & Multi-Level SRAM Simulation
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -15,7 +15,7 @@ In deep neural network edge accelerators (NPUs), execution performance and therm
 
 This repository provides an **end-to-end analytical and empirical memory hierarchy framework**:
 1. **NPU Roofline Formulation**: Maps operator arithmetic intensities ($I = \text{FLOPs} / \text{Byte}$) against off-chip DRAM ($64\text{ GB/s}$) and on-chip SRAM ($512\text{ GB/s}$) boundaries, pinpointing the optimal operating knee ($I^* = 250.0\text{ FLOP/B}$).
-2. **Ping-Pong Double-Buffering Simulation**: Models asynchronous DMA prefetching overlapped with PE matrix execution ($T_{\text{tile}} = \max(T_{\text{DMA}}, T_{\text{compute}})$), achieving an average **$46.8\%$ memory latency hiding**.
+2. **Ping-Pong Double-Buffering Simulation**: Models asynchronous DMA prefetching overlapped with PE matrix execution ($T_{\text{tile}} = \max(T_{\text{DMA}}, T_{\text{compute}})$), achieving **$45.10\%$ memory latency hiding** (computed 2026-09-10 with the same 128-tile pipeline parameters as the double-buffering engine, see `roofline_and_double_buffering_model.py`).
 3. **8-Bank SRAM Contention Engine**: Cycle-accurate simulation of concurrent multi-core access requests, mitigating cross-core bank collisions by **$68.4\%$** through bank-aware topological scheduling.
 4. **Multi-Heuristic Search**: Compares Critical-Path Greedy, Rollout-Aware Lookahead Tree Search, Diversity Beam Search, and Tabu Simulated Annealing.
 
@@ -103,7 +103,7 @@ NPU-Memory-Aware-Scheduling/
 ├── project_guide.tex                     # LaTeX research paper source
 │
 ├── roofline_and_double_buffering_model.py # Roofline engine, ping-pong latency simulator, bank model
-├── memory_hierarchy.py                   # Multi-tier SRAM/DRAM residency & spill model
+├── memory_hierarchy.py                   # Multi-level SRAM/DRAM residency & spill model
 ├── bandwidth_estimator.py                # Dual-channel bus contention & backlog model
 ├── graph_builder.py                      # Operator DAG parser & topological sort
 ├── cost_model.py                         # Composite cost model
@@ -140,7 +140,7 @@ Portfolio: [yagneshkumarkoduru.vercel.app](https://yagneshkumarkoduru.vercel.app
 ```bibtex
 @misc{koduru2026npumemory,
   author = {Koduru, Yagnesh Kumar},
-  title = {NPU-Memory-Aware-Scheduling: Roofline Analysis, Double-Buffering & Multi-Tier SRAM Simulation},
+  title = {NPU-Memory-Aware-Scheduling: Roofline Analysis, Double-Buffering & Multi-Level SRAM Simulation},
   year = {2026},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/yagneshkumarkoduru/NPU-Memory-Aware-Scheduling}}

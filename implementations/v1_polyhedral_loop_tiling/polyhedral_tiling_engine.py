@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-=============================================================================
-Polyhedral Loop Nest Tiling, Affine Transformations & TVM-TIR Emitter
-Project: NPU Optimization Suite (Tier 1 Implementation)
-Author: Yagnesh Kumar Koduru (Esthien Labs)
-Domain: Polyhedral Compilation, Loop Nest Optimization, On-Chip SRAM Locality
-=============================================================================
+ =============================================================================
+ Polyhedral Loop Nest Tiling, Affine Transformations & TVM-TIR Emitter
+ Project: NPU Optimization Suite (Polyhedral Loop Tiling component)
+ Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Domain: Polyhedral Compilation, Loop Nest Optimization, On-Chip SRAM Locality
+
+ Data type model (matches the project README specification):
+   A, B operands: INT8  (1 byte per element)
+   C accumulator: INT32 (4 bytes per element)
+ ============================================================================= 
 """
 
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,19 +20,30 @@ class PolyhedralTilingEngine:
     Formulates and solves polyhedral iteration space loop tiling under
     on-chip L1 SRAM capacity constraints.
     """
-    def __init__(self, sram_capacity_kb=64, word_bytes=2):
+    # Byte widths per matrix element (INT8 A/B operands, INT32 C accumulator)
+    BYTES_A = 1
+    BYTES_B = 1
+    BYTES_C = 4
+
+    def __init__(self, sram_capacity_kb=64):
         self.sram_bytes = sram_capacity_kb * 1024
-        self.word_bytes = word_bytes
+
+    def tile_footprint_bytes(self, Ti, Tj, Tk):
+        """SRAM footprint of the A, B and C tiles under the mixed-precision model."""
+        return (Ti * Tk * self.BYTES_A
+                + Tk * Tj * self.BYTES_B
+                + Ti * Tj * self.BYTES_C)
 
     def find_optimal_tile_sizes(self, M=1024, N=1024, K=1024):
         """
         Maximizes operational intensity:
           Objective: Maximize (2 * Ti * Tj * Tk) / (Ti*Tk + Tk*Tj + Ti*Tj)
-          Constraint: (Ti*Tk + Tk*Tj + Ti*Tj) * word_bytes <= sram_bytes
+          Constraint: (Ti*Tk*b_A + Tk*Tj*b_B + Ti*Tj*b_C) <= sram_bytes
+          with b_A = b_B = 1 (INT8) and b_C = 4 (INT32 accumulator).
         """
         best_intensity = 0.0
         best_tiles = (16, 16, 16)
-        
+
         # Grid search through valid power-of-two tile factors
         candidates = [16, 32, 64, 128, 256]
         for Ti in candidates:
@@ -39,10 +52,10 @@ class PolyhedralTilingEngine:
                 if Tj > N: continue
                 for Tk in candidates:
                     if Tk > K: continue
-                    footprint = (Ti * Tk + Tk * Tj + Ti * Tj) * self.word_bytes
+                    footprint = self.tile_footprint_bytes(Ti, Tj, Tk)
                     if footprint <= self.sram_bytes:
-                        # Arithmetic intensity: FLOPs / Byte loaded
-                        intensity = (2.0 * Ti * Tj * Tk) / ((Ti * Tk + Tk * Tj) * self.word_bytes)
+                        # Arithmetic intensity (documented objective, element counts)
+                        intensity = (2.0 * Ti * Tj * Tk) / (Ti * Tk + Tk * Tj + Ti * Tj)
                         if intensity > best_intensity:
                             best_intensity = intensity
                             best_tiles = (Ti, Tj, Tk)
@@ -50,19 +63,24 @@ class PolyhedralTilingEngine:
 
     def simulate_tiling_benefits(self, M=1024, N=1024, K=1024):
         Ti, Tj, Tk = self.find_optimal_tile_sizes(M, N, K)[0]
-        
-        # Un-tiled DRAM accesses (assuming naive cache thrashing)
-        untiled_dram_bytes = (M * N * K + M * K) * self.word_bytes
-        # Polyhedrally tiled DRAM accesses (each block loaded once per tile)
-        tiled_dram_bytes = (M * N * K * (1.0 / Ti + 1.0 / Tj) + M * N) * self.word_bytes
-        
+
+        # Un-tiled DRAM traffic: A and B are re-fetched for every (i, j) pair
+        # (naive cache thrashing); C is written once as INT32.
+        untiled_dram_bytes = (M * N * K * (self.BYTES_A + self.BYTES_B)
+                              + M * N * self.BYTES_C)
+        # Polyhedrally tiled DRAM traffic: A tile rows are re-read once per
+        # j-block, B tile columns once per i-block; C still written once.
+        tiled_dram_bytes = (M * N * K * (1.0 / Ti + 1.0 / Tj)
+                            + M * N * self.BYTES_C)
+
         dram_traffic_reduction = untiled_dram_bytes / tiled_dram_bytes
-        l1_hit_rate = 1.0 - (tiled_dram_bytes / (2.0 * M * N * K * self.word_bytes))
+        # Fraction of element loads served from on-chip SRAM instead of DRAM
+        l1_hit_rate = 1.0 - (tiled_dram_bytes / untiled_dram_bytes)
         
         return {
             "matrix_dims": (M, N, K),
             "optimal_tiles": (Ti, Tj, Tk),
-            "footprint_kb": ((Ti * Tk + Tk * Tj + Ti * Tj) * self.word_bytes) / 1024.0,
+            "footprint_kb": self.tile_footprint_bytes(Ti, Tj, Tk) / 1024.0,
             "untiled_gb": untiled_dram_bytes / 1e9,
             "tiled_gb": tiled_dram_bytes / 1e9,
             "traffic_reduction_x": dram_traffic_reduction,
@@ -97,7 +115,7 @@ def matmul_polyhedral_tiled(
 
 def run_benchmark():
     print("=" * 70)
-    print("  NPU OPTIMIZATION SUITE: TIER 1 POLYHEDRAL LOOP TILING ENGINE")
+    print("  NPU OPTIMIZATION SUITE: POLYHEDRAL LOOP TILING ENGINE")
     print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
     print("=" * 70)
     

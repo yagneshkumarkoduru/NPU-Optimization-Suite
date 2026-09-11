@@ -4,20 +4,42 @@
     "fused_traffic_kb": 9984,
     "dram_traffic_reduction_pct": 27.77777777777778,
     "sram_compression_pct": 99.63541666666667,
-    "kernel_speedup": 1.95
+    "intensity_unfused": 0.1111111111111111,
+    "intensity_fused": 0.15384615384615385,
+    "kernel_speedup": 1.3846153846153848
   },
   "roofline_double_buffering": {
     "intensity": 187.5,
     "is_compute_bound": false,
     "latency_hiding_pct": 35.714285714285715,
-    "sram_conflict_reduction_pct": 68.4
+    "bank_peak_load_uncoordinated": 69.0,
+    "bank_peak_load_coordinated": 64.0,
+    "sram_conflict_reduction_pct": 7.246376811594201
   },
   "quantum_bifurcation": {
-    "sba_runtime_ms": 3.1205001287162304,
-    "sa_runtime_ms": 266.17866097949445,
-    "speedup_x": 85.3,
-    "final_energy": -32.57722580511368,
-    "qaoa_approx_ratio": 0.892
-  },
-  "net_energy_reduction_pct": 25.62
+    "sba_runtime_ms": 12.911600002553314,
+    "bsba_single_run_ms": 1.6494000010425225,
+    "bsba_single_run_energy": -33.5676037053654,
+    "bsba_restarts_ms": 12.805199992726557,
+    "bsba_polish_ms": 0.10390000534243882,
+    "bsba_polish_flips": 0,
+    "num_restarts": 8,
+    "num_steps": 150,
+    "sa_runtime_ms": 28.231699994648807,
+    "speedup_x": 2.1865376861942663,
+    "final_energy": -42.755676689222014,
+    "bsba_raw_energy": -42.755676689222014,
+    "bsba_polish_energy": -42.755676689222014,
+    "sa_best_energy": -42.75567668922206,
+    "qaoa_approx_ratio": 0.6943677272530057,
+    "qaoa_best_p": 3,
+    "qaoa_per_p_ratios": {
+      "1": 0.4331418538025282,
+      "2": 0.5946054390113718,
+      "3": 0.6943677272530057
+    },
+    "qaoa_energy": -8.319252874810344,
+    "qaoa_ground_energy": -11.981047719084259,
+    "qaoa_subinstance_spins": 14
+  }
 }

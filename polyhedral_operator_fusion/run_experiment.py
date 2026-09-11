@@ -1,3 +1,16 @@
+"""Shared memory-hierarchy scheduling experiment harness.
+
+This module is intentionally identical to
+memory_hierarchy_scheduling/run_experiment.py: it runs the generic
+multi-heuristic scheduler benchmark (Greedy, Lookahead, Beam Search, Tabu
+Annealing, QAOA-style refinement, APR) over a workload DAG using the
+schedule_analysis / cost_model pipeline shared across the suite.
+
+The polyhedral fusion results (kernel fusion speedup and activation memory
+compression figures) do NOT come from this script. They are produced by
+polyhedral_fusion_and_memory_compression.py in this same directory.
+"""
+
 from __future__ import annotations
 
 import json

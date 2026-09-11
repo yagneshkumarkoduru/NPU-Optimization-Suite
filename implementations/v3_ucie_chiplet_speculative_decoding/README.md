@@ -1,12 +1,12 @@
-# Tier 3 Implementation: 2.5D/3D UCIe Chiplet Interconnect & Speculative Decoding Pass
+# UCIe Chiplet Interconnect & Speculative Decoding Pass (NPU Optimization Suite Component)
 
 ## 1. Overview
 
-Tier 3 introduces a compiler pass targeting multi-die heterogeneous architectures interconnected via Universal Chiplet Interconnect Express (UCIe 1.1/2.0). It combines a **Quadratic Assignment Problem (QAP)** formulation to map tensor partitions across physical chiplets with a **Tree Speculative Decoding** pass that amortizes off-chip DRAM memory accesses.
+This component introduces a compiler pass targeting multi-die heterogeneous architectures interconnected via Universal Chiplet Interconnect Express (UCIe 1.1/2.0). It combines a **Quadratic Assignment Problem (QAP)** formulation to map tensor partitions across physical chiplets with a **Tree Speculative Decoding** pass that amortizes off-chip DRAM memory accesses.
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
-│                     TIER 3: UCIe 2.5D CHIPLET MESH                        │
+│                    UCIe 2.5D CHIPLET MESH (4 DIES)                        │
 │                                                                           │
 │  ┌───────────────────────┐                    ┌────────────────────────┐  │
 │  │ Chiplet 0 (Draft LLM) │◄── UCIe 64 GB/s ──►│ Chiplet 1 (Target L1-8)│  │
@@ -62,7 +62,7 @@ When draft generation latency $\tau_{\text{draft}} \ll \tau_{\text{target}}$ and
 
 ## 4. Benchmark Execution
 
-Execute the Tier 3 optimization harness:
+Execute the UCIe chiplet optimization harness:
 
 ```bash
 python implementations/v3_ucie_chiplet_speculative_decoding/chiplet_speculative_compiler.py

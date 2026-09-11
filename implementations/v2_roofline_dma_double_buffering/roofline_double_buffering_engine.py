@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-=============================================================================
-Williams Roofline & Ping-Pong Double-Buffering DMA Engine
-Project: NPU Optimization Suite (Tier 2 Implementation)
-Author: Yagnesh Kumar Koduru (Esthien Labs)
-Domain: Memory Hierarchy, Double-Buffering, Latency Hiding, Roofline Analysis
-=============================================================================
+ =============================================================================
+ Williams Roofline & Ping-Pong Double-Buffering DMA Engine
+ Project: NPU Optimization Suite (Roofline & Double-Buffering component)
+ Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Domain: Memory Hierarchy, Double-Buffering, Latency Hiding, Roofline Analysis
+ =============================================================================
 """
 
-import os
-import sys
 import numpy as np
 
 class RooflineDoubleBufferingEngine:
@@ -74,7 +72,7 @@ class RooflineDoubleBufferingEngine:
 
 def run_benchmark():
     print("=" * 70)
-    print("  NPU OPTIMIZATION SUITE: TIER 2 ROOFLINE & DOUBLE-BUFFERING ENGINE")
+    print("  NPU OPTIMIZATION SUITE: ROOFLINE & DOUBLE-BUFFERING ENGINE")
     print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
     print("=" * 70)
     

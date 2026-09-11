@@ -1,8 +1,8 @@
-# Tier 2 Implementation: Williams Roofline & Asynchronous Double-Buffering DMA Engine
+# Williams Roofline & Asynchronous Double-Buffering DMA Engine (NPU Optimization Suite Component)
 
 ## 1. Overview
 
-Tier 2 implements a hardware-aware performance modeling and memory hierarchy scheduling system. It models the Williams Roofline bounds across a 3-tier memory hierarchy (L1 Scratchpad, L2 Global Buffer, Off-chip DRAM) and schedules asynchronous ping-pong DMA transfers to hide DRAM latency behind arithmetic execution.
+This component implements a hardware-aware performance modeling and memory hierarchy scheduling system. It models the Williams Roofline bounds across a three-level memory hierarchy (L1 Scratchpad, L2 Global Buffer, Off-chip DRAM) and schedules asynchronous ping-pong DMA transfers to hide DRAM latency behind arithmetic execution.
 
 ```
                     Off-Chip DRAM (64 GB/s LPDDR5 / HBM)
@@ -65,7 +65,7 @@ Run the simulation engine:
 python implementations/v2_roofline_dma_double_buffering/roofline_double_buffering_engine.py
 ```
 
-### Verified Empirical Performance:
+### Verified Empirical Performance (computed 2026-09-10):
 - **Roofline Knee**: $250.0\text{ FLOP/Byte}$
 - **Synchronous Execution Time**: $4.40\text{ ms}$
 - **Asynchronous Pipelined Time**: $2.42\text{ ms}$

@@ -36,9 +36,9 @@ For canonical matrix multiplication $C[i, j] += A[i, k] \times B[k, j]$:
 - Arithmetic Intensity maximization:
   $$\max_{T_i, T_j, T_k} \frac{2 T_i T_j T_k}{(T_i T_k + T_k T_j) \cdot b_{\text{in}} + T_i T_j \cdot b_{\text{acc}}}$$
 
-Setting $T_i = 128, T_j = 128, T_k = 16$ with $b_{\text{in}} = 1\text{ Byte}$ and $b_{\text{acc}} = 4\text{ Bytes}$ consumes:
-$$S = (128 \times 16 + 16 \times 128) \times 1 + (128 \times 128) \times 4 / 4 = 40.0\text{ KB} \le 64.0\text{ KB}$$
-Yielding an operational reuse factor of **$60.29\times$ reduction** in off-chip memory traffic.
+Setting $T_i = 64, T_j = 128, T_k = 128$ with $b_{\text{in}} = 1\text{ Byte}$ and $b_{\text{acc}} = 4\text{ Bytes}$ consumes:
+$$S = (64 \times 128 + 128 \times 128) \times 1 + (64 \times 128) \times 4 = 56.0\text{ KB} \le 64.0\text{ KB}$$
+Yielding an operational reuse factor of **$73.29\times$ reduction** in off-chip memory traffic (with a $98.64\%$ effective L1 hit rate). Note that the previously documented $(128, 128, 16)$ tile is infeasible under this correct byte model ($68\text{ KB} > 64\text{ KB}$).
 
 ---
 
