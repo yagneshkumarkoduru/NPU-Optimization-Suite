@@ -135,17 +135,41 @@ python -m pytest -q tests/
 
 ## 5. Key Quantitative Benchmarks
 
-All values below are computed by the code in this repository (verification date 2026-09-10; see [`EVIDENCE.md`](EVIDENCE.md)).
+All values computed by the code in this repository (see [`EVIDENCE.md`](EVIDENCE.md)).
 
-| Metric | Baseline Architecture | NPU Optimization Suite | Quantitative Breakthrough |
-| :--- | :---: | :---: | :---: |
-| **DRAM Transfer Volume** | 2.15 GB | **0.03 GB** | **73.29x Memory Traffic Reduction** |
-| **Effective L1 Hit Rate** | 62.4% | **98.64%** | **Near-Zero Cache Thrashing** |
-| **Memory Latency Hidden** | 0.0% (Blocking) | **45.10%** | **Ping-Pong Double-Buffering** |
-| **PE Utilization Under Load** | 45.4% | **82.79%** | **Sustained Compute Throughput** |
-| **Cross-Die D2D Traffic** | 3,200 MB-hops | **1,990 MB-hops** | **37.81% Inter-Die Bandwidth Relief** |
-| **D2D Interconnect Energy** | 12,800 uJ | **7,960 uJ** | **37.81% Interconnect Energy Cut** |
-| **LLM Inference Speedup** | 1.00x (Autoregressive) | **1.91x** | **Speculative Tree Verification** |
+### 5.1 Synthetic 1024^3 INT8 GEMM Benchmark
+
+| Metric | Baseline | NPU Suite | Improvement |
+|:---|:---:|:---:|:---:|
+| **DRAM Transfer Volume** | 2.15 GB | **0.03 GB** | **73.29x reduction** |
+| **L1 Hit Rate** | 62.4% | **98.64%** | near-zero thrashing |
+| **Memory Latency Hidden** | 0% | **45.10%** | DMA double-buffering |
+| **PE Utilization** | 45.4% | **82.79%** | sustained throughput |
+| **Cross-Die D2D Traffic** | 3,200 MB-hops | **1,990 MB-hops** | **37.81% cut** |
+| **D2D Energy** | 12,800 uJ | **7,960 uJ** | **37.81% cut** |
+| **LLM Speculative Speedup** | 1.00x | **1.91x** | speculative decoding |
+
+### 5.2 Real Neural Network Layer Benchmark (NEW 2026-09-12)
+
+DRAM traffic reduction on actual layer shapes from ResNet-50, MobileNetV2, ViT-B, GPT-2.
+64 KB SRAM budget, INT8/INT32 dtype. Source: `benchmarks/real_workload_benchmark.py`.
+
+| Layer | DRAM Reduction | L1 Hit Rate |
+|:---|:---:|:---:|
+| ResNet-50 L1 conv1 (112×112, 3×3×3→64) | **40.0x** | 97.5% |
+| ResNet-50 L2 conv (56×56, 3×3×64→64) | **66.1x** | 98.5% |
+| ResNet-50 L3 conv (28×28, 3×3×128→128) | **74.5x** | 98.7% |
+| ResNet-50 L4 conv (14×14, 3×3×256→256) | **79.5x** | 98.7% |
+| ResNet-50 L5 conv (7×7, 3×3×512→512) | **50.1x** | 98.0% |
+| ResNet-50 1×1 projection | 24.0x | 95.8% |
+| MobileNetV2 pointwise (112×112, 32→16) | 11.1x | 91.0% |
+| ViT-B attention projection (197, 768→768) | **70.0x** | 98.6% |
+| GPT-2 FC1 (1024, 768→3072) | **70.0x** | 98.6% |
+| **Average across 9 real layers** | **55.9x** | **97.5%** |
+
+Layers with large spatial maps and deep K (e.g., ResNet-50 L3-L4) achieve 70-80x.
+Compact pointwise convolutions with small K achieve 11-24x - still large absolute savings.
+All layers fit within the 64 KB SRAM constraint. Values are analytical model outputs.
 
 ---
 

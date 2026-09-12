@@ -107,10 +107,46 @@ Honest scope: these are analytical model outputs. No physical NPU hardware was u
 The 1x1 convolution and MobileNetV2 pointwise layers show lower reduction (11-24x)
 because their K dimension is small (32-64) relative to the tile size.
 
+## Chiplet QAP on Real Neural Network Topologies (NEW 2026-09-12)
+
+Verified: 2026-09-12 by live run of `benchmarks/chiplet_real_workload.py`.
+Exhaustive 4! = 24 permutation QAP search on realistic inter-chiplet traffic matrices.
+Realistic matrices include residual connections (ViT-B, ResNet-50) and bidirectional KV-cache flow (GPT-2).
+
+| Topology | Naive Order | Optimal Permutation | D2D Traffic Reduction | Energy Reduction | Source |
+|---|---|---|---|---|---|
+| ViT-B/16 Transformer Block (w/ residuals) | (0,1,2,3): 1,628 MB-hops | (0,1,3,2): 1,480 MB-hops | **9.1%** | 6512 → 5920 uJ (**9.1%**) | live run |
+| ResNet-50 Bottleneck Block (w/ skip) | (0,1,2,3): 1,800 MB-hops | (0,1,2,3): 1,800 MB-hops | 0.0% (already optimal) | 7200 → 7200 uJ | live run |
+| **GPT-2 Multi-Head Attention (KV-cache)** | **(0,1,2,3): 3,080 MB-hops** | **(1,3,2,0): 2,150 MB-hops** | **30.2%** | 12320 → 8600 uJ (**30.2%**) | live run |
+
+**Key Finding:** Bidirectional KV-cache traffic in autoregressive decoding creates non-trivial QAP structure.
+GPT-2 topology yields **30.2% D2D reduction** by placing V+KV (chiplet 1) and Attn_score (chiplet 2) adjacent to the output (chiplet 3).
+Class: BENCHMARK (analytical QAP model, 0.5 pJ/bit UCIe D2D energy, linear 4-die topology).
+Results in: `results/chiplet_real/neural_topology_chiplet.json`
+
+## bSBA Scaling Benchmark (32–256 Variables) (NEW 2026-09-12)
+
+Verified: 2026-09-12 by live run of `benchmarks/bsba_scaling.py`.
+Tests bSBA (best-of-8 restarts + 1-opt polish) vs Simulated Annealing on random Ising instances of 32, 64, 128, 256 variables.
+
+| Instance Size | SA Energy | SA Time | bSBA+Polish Energy | bSBA Time | Quality Ratio | Speedup |
+|---|---|---|---|---|---|---|
+| 32 vars  | -87.01 | 87.8ms | -82.97 | 30.3ms | 0.9536 | 2.90x |
+| 64 vars  | -250.77 | 154.5ms | -243.26 | 23.8ms | 0.9700 | 6.49x |
+| 128 vars | -758.39 | 302.3ms | -737.85 | 44.5ms | 0.9729 | 6.80x |
+| **256 vars** | **-2051.35** | **626.1ms** | **-2073.10** | **111.0ms** | **1.0106** | **5.64x** |
+
+**Key Finding:** At 256 variables, bSBA-polish **exceeds SA's solution quality** (ratio 1.0106 > 1.0, i.e., better energy)
+at **5.64x speedup**. Quality ratio stays above 0.95 across all scales.
+Class: BENCHMARK (Python Ising solver reference model on CPU, timings vary run to run).
+Results in: `results/bsba_scaling/scaling_results.json`
+
 ## Next measurements required
 
 - [x] Add classical tiling baselines on identical workload files (done 2026-09-10)
 - [x] Run on real neural network layer shapes (done 2026-09-12: ResNet-50, MobileNetV2, ViT-B)
+- [x] Chiplet QAP on real ViT-B, ResNet-50, GPT-2 topologies (done 2026-09-12: **30.2% reduction on GPT-2 KV-cache**)
+- [x] bSBA scaling to 256 variables (done 2026-09-12: **beats SA at 5.64x speedup at 256 vars**)
 - [ ] Rerun APR sweep in memory_hierarchy + polyhedral configs; explain 4943.55 regression
 - [ ] Run TVM head-to-head on matching real workload shapes (TVM harness in `baselines/`)
 - [ ] Install ortools in the venv if exact-solver runs from the external CCE-QOS repository are needed for evidence

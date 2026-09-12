@@ -1,0 +1,47 @@
+{
+  "description": "bSBA scaling benchmark: quality vs SA and wall-clock speedup",
+  "methodology": "bSBA best-of-8 restarts + 1-opt polish vs SA 400 sweeps",
+  "class": "BENCHMARK (CPU-hosted Python reference, timings vary run to run)",
+  "results": [
+    {
+      "n_vars": 32,
+      "sa_energy": -87.005933,
+      "sa_time_ms": 87.824,
+      "bsba_polish_energy": -82.970197,
+      "bsba_time_ms": 30.293,
+      "quality_ratio": 0.953615,
+      "speedup_x": 2.899,
+      "n_restarts": 8
+    },
+    {
+      "n_vars": 64,
+      "sa_energy": -250.771912,
+      "sa_time_ms": 154.517,
+      "bsba_polish_energy": -243.260969,
+      "bsba_time_ms": 23.818,
+      "quality_ratio": 0.970049,
+      "speedup_x": 6.487,
+      "n_restarts": 8
+    },
+    {
+      "n_vars": 128,
+      "sa_energy": -758.389255,
+      "sa_time_ms": 302.316,
+      "bsba_polish_energy": -737.849547,
+      "bsba_time_ms": 44.478,
+      "quality_ratio": 0.972917,
+      "speedup_x": 6.797,
+      "n_restarts": 8
+    },
+    {
+      "n_vars": 256,
+      "sa_energy": -2051.346828,
+      "sa_time_ms": 626.134,
+      "bsba_polish_energy": -2073.102737,
+      "bsba_time_ms": 111.002,
+      "quality_ratio": 1.010606,
+      "speedup_x": 5.641,
+      "n_restarts": 8
+    }
+  ]
+}
