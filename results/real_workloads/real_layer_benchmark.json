@@ -1,0 +1,170 @@
+{
+  "description": "Polyhedral tiling engine on real neural network layer shapes",
+  "sram_budget_kb": 64,
+  "dtype": "INT8 input, INT32 output (4x width)",
+  "avg_reduction_x": 55.86,
+  "max_reduction_x": 79.52,
+  "min_reduction_x": 11.1,
+  "layers": [
+    {
+      "name": "ResNet50 L1 conv1 112x112 3x3x3->64",
+      "M": 12544,
+      "N": 64,
+      "K": 147,
+      "tiled_gb": 0.00598,
+      "untiled_gb": 0.2392,
+      "reduction_x": 40.03,
+      "l1_hit_rate_pct": 97.5,
+      "tile_config": [
+        128,
+        64,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "ResNet50 L2 conv  56x56 3x3x64->64",
+      "M": 3136,
+      "N": 64,
+      "K": 576,
+      "tiled_gb": 0.00351,
+      "untiled_gb": 0.232,
+      "reduction_x": 66.06,
+      "l1_hit_rate_pct": 98.49,
+      "tile_config": [
+        128,
+        64,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "ResNet50 L3 conv  28x28 3x3x128->128",
+      "M": 784,
+      "N": 128,
+      "K": 1152,
+      "tiled_gb": 0.00311,
+      "untiled_gb": 0.2316,
+      "reduction_x": 74.45,
+      "l1_hit_rate_pct": 98.66,
+      "tile_config": [
+        64,
+        128,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "ResNet50 L4 conv  14x14 3x3x256->256",
+      "M": 196,
+      "N": 256,
+      "K": 2304,
+      "tiled_gb": 0.00291,
+      "untiled_gb": 0.2314,
+      "reduction_x": 79.52,
+      "l1_hit_rate_pct": 98.74,
+      "tile_config": [
+        64,
+        128,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "ResNet50 L5 conv  7x7 3x3x512->512",
+      "M": 49,
+      "N": 512,
+      "K": 4608,
+      "tiled_gb": 0.00462,
+      "untiled_gb": 0.2313,
+      "reduction_x": 50.11,
+      "l1_hit_rate_pct": 98.0,
+      "tile_config": [
+        32,
+        128,
+        256
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "ResNet50 1x1 proj 56x56 1x1x64->256",
+      "M": 3136,
+      "N": 256,
+      "K": 64,
+      "tiled_gb": 0.00442,
+      "untiled_gb": 0.106,
+      "reduction_x": 24.0,
+      "l1_hit_rate_pct": 95.83,
+      "tile_config": [
+        64,
+        128,
+        64
+      ],
+      "footprint_kb": 44.0
+    },
+    {
+      "name": "MobileNetV2 PW   112x112 1x1x32->16",
+      "M": 12544,
+      "N": 16,
+      "K": 32,
+      "tiled_gb": 0.00123,
+      "untiled_gb": 0.0136,
+      "reduction_x": 11.1,
+      "l1_hit_rate_pct": 90.99,
+      "tile_config": [
+        256,
+        16,
+        32
+      ],
+      "footprint_kb": 24.5
+    },
+    {
+      "name": "ViT-B attn proj  197 768->768",
+      "M": 197,
+      "N": 768,
+      "K": 768,
+      "tiled_gb": 0.00333,
+      "untiled_gb": 0.233,
+      "reduction_x": 70.0,
+      "l1_hit_rate_pct": 98.57,
+      "tile_config": [
+        64,
+        128,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "GPT-2 FC1        1024 768->3072",
+      "M": 1024,
+      "N": 3072,
+      "K": 768,
+      "tiled_gb": 0.06921,
+      "untiled_gb": 4.8444,
+      "reduction_x": 70.0,
+      "l1_hit_rate_pct": 98.57,
+      "tile_config": [
+        64,
+        128,
+        128
+      ],
+      "footprint_kb": 56.0
+    },
+    {
+      "name": "Synth benchmark  1024^3 INT8 GEMM",
+      "M": 1024,
+      "N": 1024,
+      "K": 1024,
+      "tiled_gb": 0.02936,
+      "untiled_gb": 2.1517,
+      "reduction_x": 73.29,
+      "l1_hit_rate_pct": 98.64,
+      "tile_config": [
+        64,
+        128,
+        128
+      ],
+      "footprint_kb": 56.0
+    }
+  ]
+}
