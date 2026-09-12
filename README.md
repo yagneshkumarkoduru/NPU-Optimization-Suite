@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
-**Affiliation:** Esthien Labs  
+**Independent Research**  
 **Domain:** NPU Architecture, Hardware-Aware Compilers, Polyhedral Geometry, Chiplet Interconnects  
 **Target Architecture:** Multi-level SRAM/DRAM Domain-Specific Neural Processing Units & 2.5D/3D Chiplet Systems  
 
