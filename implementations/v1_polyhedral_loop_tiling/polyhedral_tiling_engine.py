@@ -3,7 +3,7 @@
  =============================================================================
  Polyhedral Loop Nest Tiling, Affine Transformations & TVM-TIR Emitter
  Project: NPU Optimization Suite (Polyhedral Loop Tiling component)
- Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Author: Koduru Yagnesh Kumar
  Domain: Polyhedral Compilation, Loop Nest Optimization, On-Chip SRAM Locality
 
  Data type model (matches the project README specification):
@@ -89,7 +89,7 @@ class PolyhedralTilingEngine:
 
     def emit_tvm_tir_schedule(self, Ti, Tj, Tk):
         return f"""// TVM Tensor Intermediate Representation (TIR) Polyhedral Schedule
-// Optimized for Esthien NPU Matrix Core with L1 Double-Buffer Pinning
+// Optimized for the NPU Matrix Core with L1 Double-Buffer Pinning
 @T.prim_func
 def matmul_polyhedral_tiled(
     A: T.Buffer((1024, 1024), "int8"),
@@ -116,7 +116,7 @@ def matmul_polyhedral_tiled(
 def run_benchmark():
     print("=" * 70)
     print("  NPU OPTIMIZATION SUITE: POLYHEDRAL LOOP TILING ENGINE")
-    print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
+    print("  Author: Koduru Yagnesh Kumar               ")
     print("=" * 70)
     
     engine = PolyhedralTilingEngine(sram_capacity_kb=64)

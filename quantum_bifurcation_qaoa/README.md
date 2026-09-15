@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Domain](https://img.shields.io/badge/Domain-Quantum%20Computing%20%7C%20QUBO%20%7C%20Simulated%20Bifurcation-teal.svg)](#1-research-overview)
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
+**Author:** [Koduru Yagnesh Kumar](https://github.com/yagneshkumarkoduru)  
 **Domain:** Quantum Computing, Non-Linear Hamiltonian Dynamics, Combinatorial Optimization, NPU Accelerators  
 
 ---
@@ -133,7 +133,7 @@ python run_experiment.py --config config.yaml --workload example_workload.json -
 
 ## 6. Author & Citation
 
-**Yagnesh Kumar Koduru**  
+**Koduru Yagnesh Kumar**  
 *Researcher | Physical Intelligence, Embedded Systems, Accelerators & Control*  
 GitHub: [@yagneshkumarkoduru](https://github.com/yagneshkumarkoduru)  
 Portfolio: [yagneshkumarkoduru.vercel.app](https://yagneshkumarkoduru.vercel.app/)  

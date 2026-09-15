@@ -3,7 +3,7 @@
  =============================================================================
  Heterogeneous 2.5D/3D UCIe Chiplet Interconnect & Speculative Decoding Pass
  Project: NPU Optimization Suite (UCIe Chiplet Speculative Decoding component)
- Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Author: Koduru Yagnesh Kumar
  Domain: Chiplet Packaging, UCIe D2D Interconnect, LLM Speculative Decoding
  =============================================================================
 """
@@ -117,7 +117,7 @@ class ChipletSpeculativeCompiler:
 def run_benchmark():
     print("=" * 70)
     print("  NPU OPTIMIZATION SUITE: UCIe CHIPLET & SPECULATIVE COMPILER")
-    print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
+    print("  Author: Koduru Yagnesh Kumar               ")
     print("=" * 70)
     
     compiler = ChipletSpeculativeCompiler(num_chiplets=4, ucie_bw_gbs=64.0, d2d_energy_pj_bit=0.5)

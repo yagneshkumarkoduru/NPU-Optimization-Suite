@@ -9,7 +9,7 @@
 [![Paper](https://img.shields.io/badge/Manuscript-IEEE%20Micro%20%2F%20ACM%20TOCS-7c3aed.svg)](docs/paper/RESEARCH_PAPER.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
+**Author:** [Koduru Yagnesh Kumar](https://github.com/yagneshkumarkoduru)  
 **Independent Research**  
 **Domain:** NPU Architecture, Hardware-Aware Compilers, Polyhedral Geometry, Chiplet Interconnects  
 **Target Architecture:** Multi-level SRAM/DRAM Domain-Specific Neural Processing Units & 2.5D/3D Chiplet Systems  
@@ -175,9 +175,7 @@ All layers fit within the 64 KB SRAM constraint. Values are analytical model out
 
 ## 6. Author & Citation
 
-**Yagnesh Kumar Koduru**  
-*Systems Architect & Compiler Researcher*  
-Esthien Labs  
+**Koduru Yagnesh Kumar**  
 GitHub: [@yagneshkumarkoduru](https://github.com/yagneshkumarkoduru)  
 Portfolio: [yagneshkumarkoduru.vercel.app](https://yagneshkumarkoduru.vercel.app/)  
 

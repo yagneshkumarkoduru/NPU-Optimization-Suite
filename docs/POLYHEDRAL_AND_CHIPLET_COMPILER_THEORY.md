@@ -1,7 +1,7 @@
 # Theoretical Foundations: Polyhedral Loop Transformations, Williams Roofline Hierarchy, and 2.5D/3D UCIe Chiplet Interconnects
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
-**Affiliation:** Esthien Labs  
+**Author:** [Koduru Yagnesh Kumar](https://github.com/yagneshkumarkoduru)  
+**Affiliation:** Independent Researcher  
 **Domain:** Deep Learning Compilers, Domain-Specific Microarchitecture, Polyhedral Geometry, Packaging & Interconnects  
 
 ---

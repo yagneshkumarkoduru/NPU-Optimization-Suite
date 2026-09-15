@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Domain](https://img.shields.io/badge/Domain-Compilers%20%7C%20Kernel%20Fusion%20%7C%20SRAM%20Compression-purple.svg)](#1-research-overview)
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
+**Author:** [Koduru Yagnesh Kumar](https://github.com/yagneshkumarkoduru)  
 **Domain:** Deep Learning Compilers, Polyhedral Loop Transformation, Memory-Footprint Minimization  
 
 ---
@@ -122,7 +122,7 @@ python run_experiment.py --config config.yaml --workload example_workload.json -
 
 ## 6. Author & Citation
 
-**Yagnesh Kumar Koduru**  
+**Koduru Yagnesh Kumar**  
 *Researcher | Physical Intelligence, Embedded Systems, Accelerators & Control*  
 GitHub: [@yagneshkumarkoduru](https://github.com/yagneshkumarkoduru)  
 Portfolio: [yagneshkumarkoduru.vercel.app](https://yagneshkumarkoduru.vercel.app/)  

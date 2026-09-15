@@ -11,8 +11,8 @@ traffic matrix as the standalone UCIe Chiplet Speculative Decoding engine
 (implementations/v3_ucie_chiplet_speculative_decoding/) so that both report
 identical optimal costs.
 
-Author: Yagnesh Kumar Koduru
-Affiliation: Researcher | Esthien Labs
+Author: Koduru Yagnesh Kumar
+Affiliation: Independent Researcher
 """
 
 import os
@@ -66,7 +66,7 @@ class ChipletSpeculativeCompiler:
     def run_chiplet_benchmark(self):
         print("====================================================================")
         print("  NPU OPTIMIZATION SUITE: 2.5D CHIPLET (UCIe) & SPECULATIVE PASS   ")
-        print("  Author: Yagnesh Kumar Koduru | Esthien Labs                       ")
+        print("  Author: Koduru Yagnesh Kumar                                      ")
         print("====================================================================")
 
         # 4-Chiplet Mesh Topology: [0] <-> [1]

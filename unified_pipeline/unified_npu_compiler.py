@@ -2,7 +2,7 @@
 unified_npu_compiler.py
 =============================================================================
 Unified Hardware-Aware NPU Compiler & Optimization Engine
-Author: Yagnesh Kumar Koduru, Esthien Labs
+Author: Koduru Yagnesh Kumar
 Integrates:
   1. Polyhedral Loop Tiling & In-Register Tensor Streaming
   2. NPU Roofline Modeling & Asynchronous DMA Double-Buffering

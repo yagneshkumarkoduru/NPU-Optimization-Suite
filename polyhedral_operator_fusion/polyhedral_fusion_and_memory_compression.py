@@ -1,6 +1,6 @@
 """
 Automated Kernel Graph Rewriting, Polyhedral Loop Fusion & Activation Memory Compression
-Author: Yagnesh Kumar Koduru
+Author: Koduru Yagnesh Kumar
 Repository: NPU-Operator-Fusion-APR
 Domain: Deep Learning Compilers, Kernel Fusion, Memory Footprint Minimization
 """
@@ -150,7 +150,7 @@ class PolyhedralFusionEngine:
 def run_fusion_optimization_study():
     print("=" * 80)
     print("POLYHEDRAL OPERATOR FUSION & SRAM ACTIVATION COMPRESSION BENCHMARK")
-    print("Author: Yagnesh Kumar Koduru")
+    print("Author: Koduru Yagnesh Kumar")
     print("=" * 80)
 
     engine = PolyhedralFusionEngine()

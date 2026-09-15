@@ -3,7 +3,7 @@
  =============================================================================
  Williams Roofline & Ping-Pong Double-Buffering DMA Engine
  Project: NPU Optimization Suite (Roofline & Double-Buffering component)
- Author: Yagnesh Kumar Koduru (Esthien Labs)
+ Author: Koduru Yagnesh Kumar
  Domain: Memory Hierarchy, Double-Buffering, Latency Hiding, Roofline Analysis
  =============================================================================
 """
@@ -73,7 +73,7 @@ class RooflineDoubleBufferingEngine:
 def run_benchmark():
     print("=" * 70)
     print("  NPU OPTIMIZATION SUITE: ROOFLINE & DOUBLE-BUFFERING ENGINE")
-    print("  Author: Yagnesh Kumar Koduru | Esthien Labs")
+    print("  Author: Koduru Yagnesh Kumar               ")
     print("=" * 70)
     
     engine = RooflineDoubleBufferingEngine(peak_tflops=16.0, dram_bw_gbs=64.0)

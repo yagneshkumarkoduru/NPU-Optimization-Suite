@@ -1,6 +1,6 @@
 """
 NPU Roofline Modeling, Ping-Pong Double-Buffering & Multi-Bank SRAM Simulation
-Author: Yagnesh Kumar Koduru
+Author: Koduru Yagnesh Kumar
 Repository: NPU-Memory-Aware-Scheduling
 Domain: Domain-Specific Architecture, Memory Hierarchy Modeling, Compiler Dataflow
 """
@@ -207,7 +207,7 @@ class SRAMBankContentionModel:
 def run_memory_architecture_study():
     print("=" * 80)
     print("NPU ROOFLINE & MEMORY HIERARCHY DOUBLE-BUFFERING BENCHMARK")
-    print("Author: Yagnesh Kumar Koduru")
+    print("Author: Koduru Yagnesh Kumar")
     print("=" * 80)
 
     roofline = NPURooflineEngine(peak_ops_tflops=16.0, dram_bw_gb_s=64.0, sram_bw_gb_s=512.0)

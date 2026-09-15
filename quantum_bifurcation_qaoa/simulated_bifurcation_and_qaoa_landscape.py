@@ -1,6 +1,6 @@
 """
 Simulated Bifurcation Algorithm (SBA) & Variational QAOA Energy Landscape Benchmark
-Author: Yagnesh Kumar Koduru
+Author: Koduru Yagnesh Kumar
 Repository: Quantum-QUBO-NPU-Optimization
 Domain: Quantum Computing, Ising Solvers, Combinatorial Optimization
 
@@ -249,7 +249,7 @@ class QAOALandscapeEngine:
 def run_quantum_optimization_benchmark():
     print("=" * 80)
     print("SIMULATED BIFURCATION ALGORITHM & QAOA ENERGY LANDSCAPE BENCHMARK")
-    print("Author: Yagnesh Kumar Koduru")
+    print("Author: Koduru Yagnesh Kumar")
     print("=" * 80)
 
     sba = SimulatedBifurcationSimulator(num_spins=16, steps=400, dt=0.04)

@@ -1,8 +1,8 @@
 # A Unified Hardware-Aware Compiler Framework for Domain-Specific NPUs: Bridging Polyhedral Loop Fusion, Asynchronous Memory Hiding, and Ballistic Quantum Bifurcation
 
-**Author:** Yagnesh Kumar Koduru  
-**Affiliation:** Esthien Labs  
-**Contact:** `yagneshkumar@esthien.com`  
+**Author:** Koduru Yagnesh Kumar  
+**Affiliation:** Independent Researcher  
+**Contact:** `yagneshkumarkoduru@gmail.com`  
 **Target Publication Venue:** IEEE Micro / ACM Transactions on Computer Systems (TOCS)  
 
 ---

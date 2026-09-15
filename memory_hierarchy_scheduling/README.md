@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Domain](https://img.shields.io/badge/Domain-NPU%20Compilers%20%7C%20Memory%20Hierarchy%20%7C%20Roofline-orange.svg)](#1-research-overview)
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
+**Author:** [Koduru Yagnesh Kumar](https://github.com/yagneshkumarkoduru)  
 **Domain:** Domain-Specific Architecture, Compiler Dataflow Optimization, NPU Memory Hierarchy Modeling  
 
 ---
@@ -132,7 +132,7 @@ python run_experiment.py --config config.yaml --workload example_workload.json -
 
 ## 6. Author & Citation
 
-**Yagnesh Kumar Koduru**  
+**Koduru Yagnesh Kumar**  
 *Researcher | Physical Intelligence, Embedded Systems, Accelerators & Control*  
 GitHub: [@yagneshkumarkoduru](https://github.com/yagneshkumarkoduru)  
 Portfolio: [yagneshkumarkoduru.vercel.app](https://yagneshkumarkoduru.vercel.app/)  
