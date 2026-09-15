@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+pytest.importorskip("ortools")
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from baselines.cce_qos_head_to_head.cpsat_vs_bsba import (  # noqa: E402
     OBJECTIVE_SCALE,
